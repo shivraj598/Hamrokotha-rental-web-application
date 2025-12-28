@@ -1,0 +1,209 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Service Requests{% endblock %}
+{% block page_title %}Service Requests{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Tabs -->
+    <div class="bg-white rounded-xl shadow-sm p-2" x-data="{ activeTab: '{{ request.GET.tab|default:'find_room' }}' }">
+        <div class="flex gap-2">
+            <a href="?tab=find_room" 
+               class="flex-1 py-3 px-4 text-center rounded-lg transition-colors
+                      {% if request.GET.tab == 'find_room' or not request.GET.tab %}bg-primary-600 text-white{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                Find Room Requests
+                <span class="ml-2 inline-flex px-2 py-0.5 text-xs rounded-full 
+                      {% if request.GET.tab == 'find_room' or not request.GET.tab %}bg-primary-500{% else %}bg-gray-200{% endif %}">
+                    {{ find_room_count }}
+                </span>
+            </a>
+            <a href="?tab=shift_home"
+               class="flex-1 py-3 px-4 text-center rounded-lg transition-colors
+                      {% if request.GET.tab == 'shift_home' %}bg-primary-600 text-white{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                Shift Home Requests
+                <span class="ml-2 inline-flex px-2 py-0.5 text-xs rounded-full 
+                      {% if request.GET.tab == 'shift_home' %}bg-primary-500{% else %}bg-gray-200{% endif %}">
+                    {{ shift_home_count }}
+                </span>
+            </a>
+        </div>
+    </div>
+    
+    {% if request.GET.tab == 'shift_home' %}
+        <!-- Shift Home Requests -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Shift Home Requests</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                User
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Shift Type
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                From → To
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Est. Cost
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for request in shift_home_requests %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ request.user.get_full_name }}</div>
+                                    <div class="text-sm text-gray-500">{{ request.user.email }}</div>
+                                    <div class="text-xs text-gray-400">{{ request.user.phone_number }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full
+                                          {% if request.shift_type == 'WITHIN_CITY' %}bg-blue-100 text-blue-800
+                                          {% elif request.shift_type == 'INTER_CITY' %}bg-purple-100 text-purple-800
+                                          {% else %}bg-orange-100 text-orange-800{% endif %}">
+                                        {{ request.get_shift_type_display }}
+                                    </span>
+                                    <p class="text-xs text-gray-500 mt-1">{{ request.get_property_size_display }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">{{ request.from_location|truncatechars:20 }}</div>
+                                    <div class="text-xs text-gray-400">↓</div>
+                                    <div class="text-sm text-gray-900">{{ request.to_location|truncatechars:20 }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ request.preferred_date|date:"M d, Y" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full
+                                          {% if request.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                                          {% elif request.status == 'CONTACTED' %}bg-blue-100 text-blue-800
+                                          {% elif request.status == 'SCHEDULED' %}bg-indigo-100 text-indigo-800
+                                          {% elif request.status == 'COMPLETED' %}bg-green-100 text-green-800
+                                          {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ request.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {% if request.estimated_cost %}
+                                        Rs. {{ request.estimated_cost|floatformat:0 }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <a href="{% url 'services:shift_home_detail' request.pk %}" target="_blank"
+                                       class="text-primary-600 hover:text-primary-800">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                                    No shift home requests found.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <!-- Find Room Requests -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Find Room Requests</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                User
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Requirements
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Location
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Budget
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Move-in
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for request in find_room_requests %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ request.user.get_full_name }}</div>
+                                    <div class="text-sm text-gray-500">{{ request.user.email }}</div>
+                                    <div class="text-xs text-gray-400">{{ request.user.phone_number }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ request.get_property_type_display }}</div>
+                                    <div class="text-xs text-gray-500">{{ request.bedrooms }} bedroom(s)</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">{{ request.get_district_display }}</div>
+                                    <div class="text-xs text-gray-500">{{ request.preferred_areas|truncatechars:25 }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ request.get_budget_range_display }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ request.move_in_date|date:"M d, Y" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full
+                                          {% if request.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                                          {% elif request.status == 'IN_PROGRESS' %}bg-blue-100 text-blue-800
+                                          {% elif request.status == 'MATCHED' %}bg-green-100 text-green-800
+                                          {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ request.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <a href="{% url 'services:find_room_detail' request.pk %}" target="_blank"
+                                       class="text-primary-600 hover:text-primary-800">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                                    No find room requests found.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
