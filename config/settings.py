@@ -56,15 +56,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Add debug toolbar in development
-if DEBUG:
-    INSTALLED_APPS += ['debug_toolbar']
-    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
-    INTERNAL_IPS = ['127.0.0.1']
-    # Disable redirect interception in debug toolbar
-    DEBUG_TOOLBAR_CONFIG = {
-        'INTERCEPT_REDIRECTS': False,
-    }
+# Add debug toolbar in development (disabled to avoid redirect interception)
+# if DEBUG:
+#     INSTALLED_APPS += ['debug_toolbar']
+#     MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+#     INTERNAL_IPS = ['127.0.0.1']
+#     DEBUG_TOOLBAR_CONFIG = {
+#         'INTERCEPT_REDIRECTS': False,
+#     }
 
 ROOT_URLCONF = 'config.urls'
 
