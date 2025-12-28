@@ -12,7 +12,7 @@ from apps.accounts.models import User
 from apps.properties.models import Property, PropertyView, Favorite
 from apps.inquiries.models import Inquiry, InquiryMessage
 from apps.services.models import FindRoomRequest, ShiftHomeRequest
-from apps.core.choices import PropertyType
+from apps.core.choices import PropertyType, PropertyStatus, District
 
 
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -109,8 +109,8 @@ class PropertyManagementView(AdminRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['status_choices'] = Property.STATUS_CHOICES
-        context['district_choices'] = Property.DISTRICT_CHOICES
+        context['status_choices'] = PropertyStatus.choices
+        context['district_choices'] = District.choices
         context['pending_count'] = Property.objects.filter(status='PENDING').count()
         return context
 
