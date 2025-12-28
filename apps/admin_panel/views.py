@@ -12,7 +12,7 @@ from apps.accounts.models import User
 from apps.properties.models import Property, PropertyView, Favorite
 from apps.inquiries.models import Inquiry, InquiryMessage
 from apps.services.models import FindRoomRequest, ShiftHomeRequest
-from apps.core.choices import PropertyType, PropertyStatus, District
+from apps.core.choices import PropertyType, PropertyStatus, District, UserType
 
 
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -185,7 +185,7 @@ class UserManagementView(AdminRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['user_type_choices'] = User.USER_TYPE_CHOICES
+        context['user_type_choices'] = UserType.choices
         context['total_users'] = User.objects.count()
         context['total_landlords'] = User.objects.filter(user_type='LANDLORD').count()
         context['total_tenants'] = User.objects.filter(user_type='TENANT').count()
