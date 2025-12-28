@@ -194,9 +194,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             
             # Inquiries sent
             context['inquiries'] = Inquiry.objects.filter(
-                tenant=user
-            ).select_related('property').order_by('-created_at')[:5]
-            context['total_inquiries'] = Inquiry.objects.filter(tenant=user).count()
+                sender=user
+            ).select_related('rental_property').order_by('-created_at')[:5]
+            context['total_inquiries'] = Inquiry.objects.filter(sender=user).count()
             
             # Recommended properties
             context['recommended_properties'] = Property.objects.filter(

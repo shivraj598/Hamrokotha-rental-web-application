@@ -182,11 +182,11 @@
                                     <div class="flex items-start">
                                         <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                                             <span class="text-sm font-medium text-gray-600">
-                                                {{ inquiry.tenant.first_name|slice:":1"|upper }}
+                                                {{ inquiry.sender.first_name|slice:":1"|upper }}
                                             </span>
                                         </div>
                                         <div class="ml-3 flex-grow">
-                                            <p class="font-medium text-gray-900">{{ inquiry.tenant.get_full_name }}</p>
+                                            <p class="font-medium text-gray-900">{{ inquiry.sender.get_full_name }}</p>
                                             <p class="text-sm text-gray-500 truncate">{{ inquiry.rental_property.title }}</p>
                                             <p class="text-xs text-gray-400 mt-1">{{ inquiry.created_at|timesince }} ago</p>
                                         </div>
