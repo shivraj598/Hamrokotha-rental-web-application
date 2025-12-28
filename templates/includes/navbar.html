@@ -1,6 +1,6 @@
 {% load static %}
 <!-- Navigation Bar -->
-<nav class="bg-white shadow-md sticky top-0 z-40" x-data="{ mobileMenuOpen: false, userMenuOpen: false }">
+<nav class="bg-gray-800 shadow-md sticky top-0 z-40" x-data="{ mobileMenuOpen: false, userMenuOpen: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <!-- Logo -->
@@ -13,16 +13,16 @@
             
             <!-- Desktop Navigation -->
             <div class="hidden md:flex items-center space-x-6">
-                <a href="{% url 'core:home' %}" class="text-gray-700 hover:text-primary-600 font-medium transition">
+                <a href="{% url 'core:home' %}" class="text-white hover:text-primary-400 font-medium transition">
                     Home
                 </a>
-                <a href="{% url 'properties:list' %}" class="text-gray-700 hover:text-primary-600 font-medium transition">
+                <a href="{% url 'properties:list' %}" class="text-white hover:text-primary-400 font-medium transition">
                     Properties
                 </a>
-                <a href="{% url 'services:find_room' %}" class="text-gray-700 hover:text-primary-600 font-medium transition">
+                <a href="{% url 'services:find_room' %}" class="text-white hover:text-primary-400 font-medium transition">
                     Find Room
                 </a>
-                <a href="{% url 'services:shift_home' %}" class="text-gray-700 hover:text-primary-600 font-medium transition">
+                <a href="{% url 'services:shift_home' %}" class="text-white hover:text-primary-400 font-medium transition">
                     Shift Home
                 </a>
                 
@@ -30,7 +30,7 @@
                     <!-- User Menu -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" 
-                                class="flex items-center space-x-2 text-gray-700 hover:text-primary-600 focus:outline-none">
+                                class="flex items-center space-x-2 text-white hover:text-primary-400 focus:outline-none">
                             {% if user.profile_picture %}
                                 <img src="{{ user.profile_picture.url }}" 
                                      class="w-8 h-8 rounded-full object-cover" 
@@ -127,7 +127,7 @@
                 {% else %}
                     <!-- Auth Buttons -->
                     <a href="{% url 'accounts:login' %}" 
-                       class="text-gray-700 hover:text-primary-600 font-medium transition">
+                       class="text-white hover:text-primary-400 font-medium transition">
                         Login
                     </a>
                     <a href="{% url 'accounts:register' %}" 
@@ -140,7 +140,7 @@
             <!-- Mobile Menu Button -->
             <div class="md:hidden flex items-center">
                 <button @click="mobileMenuOpen = !mobileMenuOpen" 
-                        class="text-gray-700 hover:text-primary-600 focus:outline-none">
+                        class="text-white hover:text-primary-400 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -158,29 +158,29 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 transform translate-y-0"
          x-transition:leave-end="opacity-0 transform -translate-y-2"
-         class="md:hidden bg-white border-t">
+         class="md:hidden bg-gray-700 border-t border-gray-600">
         <div class="px-4 py-3 space-y-3">
-            <a href="{% url 'core:home' %}" class="block text-gray-700 hover:text-primary-600">Home</a>
-            <a href="{% url 'properties:list' %}" class="block text-gray-700 hover:text-primary-600">Properties</a>
-            <a href="{% url 'services:find_room' %}" class="block text-gray-700 hover:text-primary-600">Find Room</a>
-            <a href="{% url 'services:shift_home' %}" class="block text-gray-700 hover:text-primary-600">Shift Home</a>
+            <a href="{% url 'core:home' %}" class="block text-white hover:text-primary-400">Home</a>
+            <a href="{% url 'properties:list' %}" class="block text-white hover:text-primary-400">Properties</a>
+            <a href="{% url 'services:find_room' %}" class="block text-white hover:text-primary-400">Find Room</a>
+            <a href="{% url 'services:shift_home' %}" class="block text-white hover:text-primary-400">Shift Home</a>
             
             {% if user.is_authenticated %}
-                <hr class="my-2">
-                <a href="{% url 'accounts:dashboard' %}" class="block text-gray-700 hover:text-primary-600">Dashboard</a>
-                <a href="{% url 'accounts:profile' %}" class="block text-gray-700 hover:text-primary-600">Profile</a>
-                <a href="{% url 'inquiries:list' %}" class="block text-gray-700 hover:text-primary-600">Inquiries</a>
+                <hr class="my-2 border-gray-600">
+                <a href="{% url 'accounts:dashboard' %}" class="block text-white hover:text-primary-400">Dashboard</a>
+                <a href="{% url 'accounts:profile' %}" class="block text-white hover:text-primary-400">Profile</a>
+                <a href="{% url 'inquiries:list' %}" class="block text-white hover:text-primary-400">Inquiries</a>
                 {% if user.is_staff %}
-                    <a href="{% url 'admin_panel:dashboard' %}" class="block text-primary-600">Admin Panel</a>
+                    <a href="{% url 'admin_panel:dashboard' %}" class="block text-primary-300">Admin Panel</a>
                 {% endif %}
                 <form action="{% url 'accounts:logout' %}" method="post" class="block">
                     {% csrf_token %}
-                    <button type="submit" class="text-red-600">Logout</button>
+                    <button type="submit" class="text-red-400">Logout</button>
                 </form>
             {% else %}
-                <hr class="my-2">
-                <a href="{% url 'accounts:login' %}" class="block text-gray-700 hover:text-primary-600">Login</a>
-                <a href="{% url 'accounts:register' %}" class="block text-primary-600 font-medium">Register</a>
+                <hr class="my-2 border-gray-600">
+                <a href="{% url 'accounts:login' %}" class="block text-white hover:text-primary-400">Login</a>
+                <a href="{% url 'accounts:register' %}" class="block text-primary-400 font-medium">Register</a>
             {% endif %}
         </div>
     </div>

@@ -6,10 +6,17 @@
 {% block extra_head %}
 <style>
     .hero-overlay {
-        background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 100%);
+        background: rgba(0, 0, 0, 0.95);
+    }
+    .hero-bg-image {
+        filter: blur(1px) brightness(0.5);
+        transform: scale(1.02);
     }
     .hero-text {
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+        text-shadow: 3px 3px 20px rgba(0, 0, 0, 0.95);
+    }
+    .hero-subtitle {
+        text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.98), 0 0 30px rgba(0, 0, 0, 0.9);
     }
     .search-input:focus {
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
@@ -19,12 +26,12 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="relative min-h-[600px] flex items-center">
+<section class=" relative min-h-[600px] flex items-center overflow-hidden">
     <!-- Background Image - Nepal Scenery -->
-    <div class="absolute inset-0 z-0">
-        <img src="https://images.unsplash.com/photo-1605640840605-14ac1855827b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+    <div class=" absolute inset-0 z-0">
+        <img src="{% static 'images/hero-image.png' %}" 
              alt="Kathmandu Valley with Mountains" 
-             class="w-full h-full object-cover">
+             class="w-full h-full object-cover hero-bg-image">
         <div class="hero-overlay absolute inset-0"></div>
     </div>
     
@@ -35,14 +42,14 @@
                 Find Your Perfect<br>
                 <span class="text-green-400">Rental Home</span> in Kathmandu
             </h1>
-            <p class="text-xl md:text-2xl opacity-95 max-w-2xl mx-auto">
+            <p class="text-xl md:text-2xl text-white max-w-2xl mx-auto font-bold hero-subtitle">
                 Discover the best rooms, apartments, and houses for rent across Kathmandu, Bhaktapur, and Lalitpur
             </p>
         </div>
         
         <!-- Search Box -->
         <div class="max-w-4xl mx-auto">
-            <form action="{% url 'properties:list' %}" method="get" class="bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+            <form action="{% url 'properties:list' %}" method="get" class="bg-white/60 rounded-2xl shadow-2xl p-6 md:p-8 backdrop-blur-sm">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                     <!-- District -->
                     <div>
