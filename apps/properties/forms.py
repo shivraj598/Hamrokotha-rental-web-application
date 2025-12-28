@@ -139,8 +139,8 @@ class PropertyImageForm(forms.ModelForm):
         model = PropertyImage
         fields = ['image', 'caption', 'is_primary']
         widgets = {
-            'image': forms.FileInput(attrs={
-                'class': 'hidden',
+            'image': forms.ClearableFileInput(attrs={
+                'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer',
                 'accept': 'image/*'
             }),
             'caption': forms.TextInput(attrs={
