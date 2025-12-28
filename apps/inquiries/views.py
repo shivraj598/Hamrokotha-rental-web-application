@@ -133,17 +133,27 @@ class InquiryDetailView(LoginRequiredMixin, DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['message_form'] = InquiryMessageForm()
         context['messages_list'] = self.object.messages.select_related('sender').all()
         
+        user = self.request.user
+        # Check if user can respond (only landlord and tenant can, not admin)
+        is_landlord = user == self.object.rental_property.owner
+        is_tenant = user == self.object.sender
+        context['can_respond'] = is_landlord or is_tenant
+        
+        # Only show message form if user can respond
+        if context['can_respond']:
+            context['message_form'] = InquiryMessageForm()
+        
         # Mark as read for landlord
-        if self.request.user == self.object.rental_property.owner:
+        if is_landlord:
             self.object.mark_as_read()
             # Mark all messages from tenant as read
             self.object.messages.filter(sender=self.object.sender).update(is_read=True)
-        else:
+        elif is_tenant:
             # Mark all messages from landlord as read for tenant
             self.object.messages.filter(sender=self.object.rental_property.owner).update(is_read=True)
+        # Admin just views, no marking as read
         
         return context
 

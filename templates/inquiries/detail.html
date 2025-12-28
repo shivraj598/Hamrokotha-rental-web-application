@@ -100,8 +100,8 @@
                     </div>
                 {% endif %}
                 
-                <!-- Reply Form -->
-                {% if inquiry.status != 'CLOSED' %}
+                <!-- Reply Form (only for landlord and tenant, not admin) -->
+                {% if can_respond and inquiry.status != 'CLOSED' %}
                     <div class="bg-white rounded-xl shadow-md p-6">
                         <h2 class="text-lg font-semibold text-gray-900 mb-4">Send a Message</h2>
                         
@@ -123,7 +123,7 @@
                             </div>
                         </form>
                     </div>
-                {% else %}
+                {% elif can_respond and inquiry.status == 'CLOSED' %}
                     <div class="bg-gray-100 rounded-xl p-6 text-center">
                         <p class="text-gray-600 mb-4">This inquiry has been closed.</p>
                         <form method="post" action="{% url 'inquiries:reopen' inquiry.pk %}">
@@ -132,6 +132,14 @@
                                 Reopen Inquiry
                             </button>
                         </form>
+                    </div>
+                {% elif not can_respond %}
+                    <div class="bg-blue-50 rounded-xl p-6 text-center">
+                        <svg class="w-8 h-8 text-blue-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-blue-800 font-medium">View Only Mode</p>
+                        <p class="text-blue-600 text-sm mt-1">You're viewing this inquiry as an administrator.</p>
                     </div>
                 {% endif %}
             </div>
