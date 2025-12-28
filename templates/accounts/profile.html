@@ -180,7 +180,7 @@
             {% else %}
                 <p class="text-gray-500 text-center py-8">
                     {% if user.is_landlord %}
-                        No properties yet. <a href="{% url 'properties:add' %}" class="text-primary-600 hover:underline">Add your first property</a>
+                        No properties yet. <a href="{% url 'properties:create' %}" class="text-primary-600 hover:underline">Add your first property</a>
                     {% else %}
                         No favorites yet. <a href="{% url 'properties:list' %}" class="text-primary-600 hover:underline">Browse properties</a>
                     {% endif %}
