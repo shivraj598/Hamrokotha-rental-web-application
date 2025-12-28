@@ -147,7 +147,10 @@
                 
                 <div class="flex items-center gap-4">
                     <span class="text-sm text-gray-600">{{ request.user.email }}</span>
-                    <a href="{% url 'accounts:logout' %}" class="text-sm text-red-600 hover:text-red-700">Logout</a>
+                    <form action="{% url 'accounts:logout' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-sm text-red-600 hover:text-red-700">Logout</button>
+                    </form>
                 </div>
             </header>
             

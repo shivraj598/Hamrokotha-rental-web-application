@@ -173,7 +173,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # Inquiries received
             context['recent_inquiries'] = Inquiry.objects.filter(
                 rental_property__owner=user
-            ).select_related('rental_property', 'tenant').order_by('-created_at')[:5]
+            ).select_related('rental_property', 'sender').order_by('-created_at')[:5]
             context['total_inquiries'] = Inquiry.objects.filter(rental_property__owner=user).count()
             context['pending_inquiries'] = Inquiry.objects.filter(
                 rental_property__owner=user, status='PENDING'
