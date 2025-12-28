@@ -97,8 +97,9 @@ DATABASES = {
     }
 }
 
-# Use SQLite for development if PostgreSQL is not available
-if DEBUG and not config('DATABASE_PASSWORD', default=''):
+# Use SQLite for development if USE_SQLITE is set or DATABASE_PASSWORD is empty
+_db_password = config('DATABASE_PASSWORD', default='')
+if DEBUG and (config('USE_SQLITE', default='false').lower() == 'true' or not _db_password):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
