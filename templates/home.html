@@ -5,8 +5,11 @@
 
 {% block extra_head %}
 <style>
-    .hero-gradient {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(16, 185, 129, 0.9) 100%);
+    .hero-overlay {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 100%);
+    }
+    .hero-text {
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
     }
     .search-input:focus {
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
@@ -17,22 +20,22 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="relative min-h-[600px] flex items-center">
-    <!-- Background Image -->
+    <!-- Background Image - Nepal Scenery -->
     <div class="absolute inset-0 z-0">
-        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
-             alt="Kathmandu Valley" 
+        <img src="https://images.unsplash.com/photo-1605640840605-14ac1855827b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+             alt="Kathmandu Valley with Mountains" 
              class="w-full h-full object-cover">
-        <div class="hero-gradient absolute inset-0"></div>
+        <div class="hero-overlay absolute inset-0"></div>
     </div>
     
     <!-- Content -->
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-        <div class="text-center text-white mb-12">
+        <div class="text-center text-white mb-12 hero-text">
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 Find Your Perfect<br>
-                <span class="text-green-300">Rental Home</span> in Kathmandu
+                <span class="text-green-400">Rental Home</span> in Kathmandu
             </h1>
-            <p class="text-xl md:text-2xl opacity-90 max-w-2xl mx-auto">
+            <p class="text-xl md:text-2xl opacity-95 max-w-2xl mx-auto">
                 Discover the best rooms, apartments, and houses for rent across Kathmandu, Bhaktapur, and Lalitpur
             </p>
         </div>
