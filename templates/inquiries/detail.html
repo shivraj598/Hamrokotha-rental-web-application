@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load core_tags %}
 
-{% block title %}Inquiry: {{ inquiry.property.title }} - {{ SITE_NAME }}{% endblock %}
+{% block title %}Inquiry: {{ inquiry.rental_property.title }} - {{ SITE_NAME }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -26,7 +26,7 @@
                 <li><span class="text-gray-400">/</span></li>
                 <li><a href="{% url 'inquiries:list' %}" class="text-gray-500 hover:text-primary-600">Inquiries</a></li>
                 <li><span class="text-gray-400">/</span></li>
-                <li class="text-gray-900 font-medium">{{ inquiry.property.title|truncatewords:3 }}</li>
+                <li class="text-gray-900 font-medium">{{ inquiry.rental_property.title|truncatewords:3 }}</li>
             </ol>
         </nav>
         
@@ -37,7 +37,7 @@
                 <div class="bg-white rounded-xl shadow-md p-6">
                     <div class="flex items-start justify-between mb-4">
                         <div>
-                            <h1 class="text-xl font-bold text-gray-900">Inquiry for {{ inquiry.property.title }}</h1>
+                            <h1 class="text-xl font-bold text-gray-900">Inquiry for {{ inquiry.rental_property.title }}</h1>
                             <p class="text-sm text-gray-500 mt-1">
                                 Started {{ inquiry.created_at|date:"M d, Y" }} at {{ inquiry.created_at|time:"g:i A" }}
                             </p>
@@ -141,8 +141,8 @@
                 <!-- Property Card -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden">
                     <div class="h-32 bg-gray-100">
-                        {% if inquiry.property.primary_image %}
-                            <img src="{{ inquiry.property.primary_image.image.url }}" 
+                        {% if inquiry.rental_property.primary_image %}
+                            <img src="{{ inquiry.rental_property.primary_image.image.url }}" 
                                  alt=""
                                  class="w-full h-full object-cover">
                         {% else %}
@@ -155,16 +155,16 @@
                     </div>
                     
                     <div class="p-4">
-                        <a href="{% url 'properties:detail' inquiry.property.pk %}" 
+                        <a href="{% url 'properties:detail' inquiry.rental_property.pk %}" 
                            class="font-semibold text-gray-900 hover:text-primary-600">
-                            {{ inquiry.property.title }}
+                            {{ inquiry.rental_property.title }}
                         </a>
                         <p class="text-sm text-gray-500 mt-1">
-                            {{ inquiry.property.area }}, {{ inquiry.property.get_district_display }}
+                            {{ inquiry.rental_property.area }}, {{ inquiry.rental_property.get_district_display }}
                         </p>
-                        <p class="text-lg font-bold text-primary-600 mt-2">{{ inquiry.property.price_per_month|npr }}</p>
+                        <p class="text-lg font-bold text-primary-600 mt-2">{{ inquiry.rental_property.price_per_month|npr }}</p>
                         
-                        <a href="{% url 'properties:detail' inquiry.property.pk %}" 
+                        <a href="{% url 'properties:detail' inquiry.rental_property.pk %}" 
                            class="mt-4 block w-full py-2 text-center border border-primary-600 text-primary-600 rounded-lg text-sm font-medium hover:bg-primary-50 transition">
                             View Property
                         </a>
@@ -174,14 +174,14 @@
                 <!-- Contact Info -->
                 <div class="bg-white rounded-xl shadow-md p-4">
                     <h3 class="font-semibold text-gray-900 mb-3">
-                        {% if user == inquiry.property.owner %}
+                        {% if user == inquiry.rental_property.owner %}
                             Tenant Information
                         {% else %}
                             Landlord Information
                         {% endif %}
                     </h3>
                     
-                    {% if user == inquiry.property.owner %}
+                    {% if user == inquiry.rental_property.owner %}
                         <!-- Show tenant info to landlord -->
                         <div class="space-y-3">
                             <div class="flex items-center gap-3">
@@ -212,10 +212,10 @@
                         <div class="space-y-3">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <span class="text-gray-600 font-medium">{{ inquiry.property.owner.first_name|slice:":1" }}{{ inquiry.property.owner.last_name|slice:":1" }}</span>
+                                    <span class="text-gray-600 font-medium">{{ inquiry.rental_property.owner.first_name|slice:":1" }}{{ inquiry.rental_property.owner.last_name|slice:":1" }}</span>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-gray-900">{{ inquiry.property.owner.get_full_name }}</p>
+                                    <p class="font-medium text-gray-900">{{ inquiry.rental_property.owner.get_full_name }}</p>
                                     <p class="text-sm text-gray-500">Landlord</p>
                                 </div>
                             </div>
@@ -224,12 +224,12 @@
                                 <div class="pt-3 border-t border-gray-100 space-y-2">
                                     <p class="text-sm">
                                         <span class="text-gray-500">Email:</span>
-                                        <a href="mailto:{{ inquiry.property.owner.email }}" class="text-primary-600 hover:underline">{{ inquiry.property.owner.email }}</a>
+                                        <a href="mailto:{{ inquiry.rental_property.owner.email }}" class="text-primary-600 hover:underline">{{ inquiry.rental_property.owner.email }}</a>
                                     </p>
-                                    {% if inquiry.property.owner.phone %}
+                                    {% if inquiry.rental_property.owner.phone %}
                                         <p class="text-sm">
                                             <span class="text-gray-500">Phone:</span>
-                                            <a href="tel:{{ inquiry.property.owner.phone }}" class="text-primary-600 hover:underline">{{ inquiry.property.owner.phone }}</a>
+                                            <a href="tel:{{ inquiry.rental_property.owner.phone }}" class="text-primary-600 hover:underline">{{ inquiry.rental_property.owner.phone }}</a>
                                         </p>
                                     {% endif %}
                                 </div>
@@ -243,7 +243,7 @@
                 </div>
                 
                 <!-- Actions -->
-                {% if user == inquiry.property.owner and inquiry.status != 'CLOSED' %}
+                {% if user == inquiry.rental_property.owner and inquiry.status != 'CLOSED' %}
                     <div class="bg-white rounded-xl shadow-md p-4">
                         <h3 class="font-semibold text-gray-900 mb-3">Actions</h3>
                         

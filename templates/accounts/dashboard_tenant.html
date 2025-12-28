@@ -133,8 +133,8 @@
                             {% for inquiry in inquiries %}
                                 <a href="{% url 'inquiries:detail' inquiry.pk %}" 
                                    class="block p-4 hover:bg-gray-50 transition">
-                                    <p class="font-medium text-gray-900 truncate">{{ inquiry.property.title }}</p>
-                                    <p class="text-sm text-gray-500">{{ inquiry.property.area }}, {{ inquiry.property.district }}</p>
+                                    <p class="font-medium text-gray-900 truncate">{{ inquiry.rental_property.title }}</p>
+                                    <p class="text-sm text-gray-500">{{ inquiry.rental_property.area }}, {{ inquiry.rental_property.district }}</p>
                                     <div class="flex items-center justify-between mt-2">
                                         <span class="text-xs px-2 py-1 rounded-full
                                               {% if inquiry.status == 'PENDING' %}bg-yellow-100 text-yellow-800

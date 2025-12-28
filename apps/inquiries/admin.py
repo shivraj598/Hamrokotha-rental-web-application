@@ -15,13 +15,13 @@ class InquiryAdmin(admin.ModelAdmin):
         'id', 'property_title', 'sender_name', 'landlord_name', 
         'status_badge', 'is_read', 'created_at'
     ]
-    list_filter = ['status', 'is_read', 'created_at', 'property__district']
+    list_filter = ['status', 'is_read', 'created_at', 'rental_property__district']
     search_fields = [
-        'property__title', 'sender__email', 'sender__first_name',
+        'rental_property__title', 'sender__email', 'sender__first_name',
         'name', 'email', 'message'
     ]
     readonly_fields = [
-        'id', 'property', 'sender', 'name', 'email', 'phone', 
+        'id', 'rental_property', 'sender', 'name', 'email', 'phone', 
         'message', 'preferred_visit_date', 'preferred_visit_time', 
         'created_at', 'updated_at'
     ]
@@ -31,7 +31,7 @@ class InquiryAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Inquiry Details', {
-            'fields': ('id', 'property', 'sender', 'status', 'is_read')
+            'fields': ('id', 'rental_property', 'sender', 'status', 'is_read')
         }),
         ('Contact Information', {
             'fields': ('name', 'email', 'phone')
@@ -46,7 +46,7 @@ class InquiryAdmin(admin.ModelAdmin):
     )
     
     def property_title(self, obj):
-        return obj.property.title[:30] + '...' if len(obj.property.title) > 30 else obj.property.title
+        return obj.rental_property.title[:30] + '...' if len(obj.rental_property.title) > 30 else obj.rental_property.title
     property_title.short_description = 'Property'
     
     def sender_name(self, obj):
@@ -54,7 +54,7 @@ class InquiryAdmin(admin.ModelAdmin):
     sender_name.short_description = 'Sender'
     
     def landlord_name(self, obj):
-        return obj.property.owner.get_full_name() or obj.property.owner.email
+        return obj.rental_property.owner.get_full_name() or obj.rental_property.owner.email
     landlord_name.short_description = 'Landlord'
     
     def status_badge(self, obj):
@@ -90,12 +90,12 @@ class InquiryAdmin(admin.ModelAdmin):
 class InquiryMessageAdmin(admin.ModelAdmin):
     list_display = ['id', 'inquiry_property', 'sender_name', 'message_preview', 'is_read', 'created_at']
     list_filter = ['is_read', 'created_at']
-    search_fields = ['message', 'sender__email', 'sender__first_name', 'inquiry__property__title']
+    search_fields = ['message', 'sender__email', 'sender__first_name', 'inquiry__rental_property__title']
     readonly_fields = ['id', 'inquiry', 'sender', 'message', 'created_at']
     list_per_page = 25
     
     def inquiry_property(self, obj):
-        return obj.inquiry.property.title[:30]
+        return obj.inquiry.rental_property.title[:30]
     inquiry_property.short_description = 'Property'
     
     def sender_name(self, obj):

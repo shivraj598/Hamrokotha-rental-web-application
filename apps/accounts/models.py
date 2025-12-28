@@ -124,5 +124,5 @@ class User(AbstractUser):
             return self.inquiries_sent.count()
         elif self.is_landlord:
             from apps.inquiries.models import Inquiry
-            return Inquiry.objects.filter(property__owner=self).count()
+            return Inquiry.objects.filter(rental_property__owner=self).count()
         return 0

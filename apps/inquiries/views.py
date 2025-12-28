@@ -40,7 +40,7 @@ class InquiryCreateView(LoginRequiredMixin, CreateView):
         
         # Check if user already has an active inquiry for this property
         existing_inquiry = Inquiry.objects.filter(
-            property=property_obj,
+            rental_property=property_obj,
             sender=self.request.user,
             status__in=['PENDING', 'RESPONDED']
         ).first()
@@ -49,7 +49,7 @@ class InquiryCreateView(LoginRequiredMixin, CreateView):
             messages.info(self.request, "You already have an active inquiry for this property.")
             return redirect('inquiries:detail', pk=existing_inquiry.pk)
         
-        form.instance.property = property_obj
+        form.instance.rental_property = property_obj
         form.instance.sender = self.request.user
         self.object = form.save()
         
@@ -69,7 +69,7 @@ class InquiryListView(LoginRequiredMixin, ListView):
         
         # Landlords see inquiries on their properties
         if user.user_type == 'LANDLORD':
-            queryset = Inquiry.objects.filter(property__owner=user)
+            queryset = Inquiry.objects.filter(rental_property__owner=user)
         # Tenants see their sent inquiries
         else:
             queryset = Inquiry.objects.filter(sender=user)
@@ -87,16 +87,16 @@ class InquiryListView(LoginRequiredMixin, ListView):
         
         property_id = self.request.GET.get('property_id')
         if property_id:
-            queryset = queryset.filter(property_id=property_id)
+            queryset = queryset.filter(rental_property_id=property_id)
         
-        return queryset.select_related('property', 'sender')
+        return queryset.select_related('rental_property', 'sender')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
         if user.user_type == 'LANDLORD':
-            base_qs = Inquiry.objects.filter(property__owner=user)
+            base_qs = Inquiry.objects.filter(rental_property__owner=user)
         else:
             base_qs = Inquiry.objects.filter(sender=user)
         
@@ -119,8 +119,8 @@ class InquiryDetailView(LoginRequiredMixin, DetailView):
         user = self.request.user
         # User can view if they're the sender or the landlord
         return Inquiry.objects.filter(
-            Q(sender=user) | Q(property__owner=user)
-        ).select_related('property', 'sender', 'property__owner')
+            Q(sender=user) | Q(rental_property__owner=user)
+        ).select_related('rental_property', 'sender', 'rental_property__owner')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -128,13 +128,13 @@ class InquiryDetailView(LoginRequiredMixin, DetailView):
         context['messages_list'] = self.object.messages.select_related('sender').all()
         
         # Mark as read for landlord
-        if self.request.user == self.object.property.owner:
+        if self.request.user == self.object.rental_property.owner:
             self.object.mark_as_read()
             # Mark all messages from tenant as read
             self.object.messages.filter(sender=self.object.sender).update(is_read=True)
         else:
             # Mark all messages from landlord as read for tenant
-            self.object.messages.filter(sender=self.object.property.owner).update(is_read=True)
+            self.object.messages.filter(sender=self.object.rental_property.owner).update(is_read=True)
         
         return context
 
@@ -146,7 +146,7 @@ class InquirySendMessageView(LoginRequiredMixin, View):
         inquiry = get_object_or_404(Inquiry, pk=pk)
         
         # Check permission
-        if request.user != inquiry.sender and request.user != inquiry.property.owner:
+        if request.user != inquiry.sender and request.user != inquiry.rental_property.owner:
             return HttpResponseForbidden("You don't have permission to send messages in this inquiry.")
         
         form = InquiryMessageForm(request.POST)
@@ -157,7 +157,7 @@ class InquirySendMessageView(LoginRequiredMixin, View):
             message.save()
             
             # Update inquiry status
-            if request.user == inquiry.property.owner and inquiry.status == 'PENDING':
+            if request.user == inquiry.rental_property.owner and inquiry.status == 'PENDING':
                 inquiry.status = 'RESPONDED'
                 inquiry.save(update_fields=['status'])
             
@@ -188,7 +188,7 @@ class InquiryCloseView(LoginRequiredMixin, View):
         inquiry = get_object_or_404(Inquiry, pk=pk)
         
         # Only landlord can close inquiry
-        if request.user != inquiry.property.owner:
+        if request.user != inquiry.rental_property.owner:
             return HttpResponseForbidden("Only the property owner can close this inquiry.")
         
         inquiry.status = 'CLOSED'
@@ -205,7 +205,7 @@ class InquiryReopenView(LoginRequiredMixin, View):
         inquiry = get_object_or_404(Inquiry, pk=pk)
         
         # Both parties can reopen
-        if request.user != inquiry.sender and request.user != inquiry.property.owner:
+        if request.user != inquiry.sender and request.user != inquiry.rental_property.owner:
             return HttpResponseForbidden("You don't have permission to reopen this inquiry.")
         
         inquiry.status = 'RESPONDED'
@@ -223,11 +223,11 @@ class UnreadCountView(LoginRequiredMixin, View):
         
         if user.user_type == 'LANDLORD':
             unread_count = Inquiry.objects.filter(
-                property__owner=user,
+                rental_property__owner=user,
                 is_read=False
             ).count()
             unread_messages = InquiryMessage.objects.filter(
-                inquiry__property__owner=user,
+                inquiry__rental_property__owner=user,
                 is_read=False
             ).exclude(sender=user).count()
         else:

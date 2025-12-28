@@ -58,7 +58,7 @@ class DashboardView(AdminRequiredMixin, TemplateView):
         
         # Recent Activity
         context['recent_properties'] = Property.objects.select_related('owner').order_by('-created_at')[:5]
-        context['recent_inquiries'] = Inquiry.objects.select_related('property', 'sender').order_by('-created_at')[:5]
+        context['recent_inquiries'] = Inquiry.objects.select_related('rental_property', 'sender').order_by('-created_at')[:5]
         context['recent_users'] = User.objects.order_by('-date_joined')[:5]
         
         # Properties by District
@@ -215,7 +215,7 @@ class InquiryManagementView(AdminRequiredMixin, ListView):
     paginate_by = 20
     
     def get_queryset(self):
-        queryset = Inquiry.objects.select_related('property', 'sender', 'property__owner').order_by('-created_at')
+        queryset = Inquiry.objects.select_related('rental_property', 'sender', 'rental_property__owner').order_by('-created_at')
         
         status = self.request.GET.get('status')
         if status:
@@ -226,7 +226,7 @@ class InquiryManagementView(AdminRequiredMixin, ListView):
             queryset = queryset.filter(
                 Q(name__icontains=search) |
                 Q(email__icontains=search) |
-                Q(property__title__icontains=search)
+                Q(rental_property__title__icontains=search)
             )
         
         return queryset
@@ -369,7 +369,7 @@ class AnalyticsView(AdminRequiredMixin, TemplateView):
                 'name': name,
                 'count': props.count(),
                 'avg_price': props.aggregate(avg=Avg('price'))['avg'] or 0,
-                'inquiries': Inquiry.objects.filter(property__district=code).count(),
+                'inquiries': Inquiry.objects.filter(rental_property__district=code).count(),
             })
         context['district_stats'] = district_stats
         

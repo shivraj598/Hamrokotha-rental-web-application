@@ -187,7 +187,7 @@
                                         </div>
                                         <div class="ml-3 flex-grow">
                                             <p class="font-medium text-gray-900">{{ inquiry.tenant.get_full_name }}</p>
-                                            <p class="text-sm text-gray-500 truncate">{{ inquiry.property.title }}</p>
+                                            <p class="text-sm text-gray-500 truncate">{{ inquiry.rental_property.title }}</p>
                                             <p class="text-xs text-gray-400 mt-1">{{ inquiry.created_at|timesince }} ago</p>
                                         </div>
                                         {% if inquiry.status == 'PENDING' %}

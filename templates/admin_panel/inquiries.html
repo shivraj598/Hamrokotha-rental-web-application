@@ -99,11 +99,11 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="{% url 'properties:detail' inquiry.property.pk %}" target="_blank" 
+                                <a href="{% url 'properties:detail' inquiry.rental_property.pk %}" target="_blank" 
                                    class="text-sm text-primary-600 hover:underline">
-                                    {{ inquiry.property.title|truncatechars:25 }}
+                                    {{ inquiry.rental_property.title|truncatechars:25 }}
                                 </a>
-                                <p class="text-xs text-gray-500">{{ inquiry.property.area }}</p>
+                                <p class="text-xs text-gray-500">{{ inquiry.rental_property.area }}</p>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ inquiry.name }}</div>

@@ -188,7 +188,7 @@
                 {% for inquiry in recent_inquiries %}
                     <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                         <div class="flex-1 min-w-0">
-                            <p class="font-medium text-gray-900 truncate">{{ inquiry.property.title }}</p>
+                            <p class="font-medium text-gray-900 truncate">{{ inquiry.rental_property.title }}</p>
                             <p class="text-sm text-gray-500">From: {{ inquiry.name }}</p>
                         </div>
                         <span class="ml-4 text-xs text-gray-400">{{ inquiry.created_at|timesince }} ago</span>

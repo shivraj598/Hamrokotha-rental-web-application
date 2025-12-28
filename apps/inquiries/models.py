@@ -14,7 +14,7 @@ class Inquiry(models.Model):
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    property = models.ForeignKey(
+    rental_property = models.ForeignKey(
         Property,
         on_delete=models.CASCADE,
         related_name='inquiries'
@@ -42,11 +42,11 @@ class Inquiry(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"Inquiry from {self.name} for {self.property.title}"
+        return f"Inquiry from {self.name} for {self.rental_property.title}"
     
     @property
     def landlord(self):
-        return self.property.owner
+        return self.rental_property.owner
     
     def mark_as_read(self):
         if not self.is_read:
