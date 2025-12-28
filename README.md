@@ -107,6 +107,15 @@ rental_platform/
    - Admin: http://localhost:8000/admin/
    - Custom Admin Panel: http://localhost:8000/admin-dashboard/
 
+## 👤 Default Admin Credentials
+
+For development, a superuser is created:
+- **Username:** admin
+- **Password:** admin123
+- **Email:** admin@hamrokotha.com
+
+> ⚠️ **Important:** Change these credentials in production!
+
 ## 📌 URL Endpoints
 
 | Endpoint | Description |
