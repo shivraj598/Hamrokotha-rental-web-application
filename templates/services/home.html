@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Services - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Our Services</h1>
+        <p class="text-xl text-primary-100 max-w-2xl mx-auto">
+            Beyond property listings, we offer additional services to make your rental journey smoother
+        </p>
+    </div>
+</section>
+
+<!-- Services Grid -->
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Find Room Service -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden group hover:shadow-xl transition">
+                <div class="h-48 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
+                    <svg class="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <div class="p-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Find Room</h3>
+                    <p class="text-gray-600 mb-6">
+                        Can't find the perfect room? Let us help! Submit your requirements and our team will 
+                        search for properties matching your needs and budget. We'll connect you with suitable 
+                        landlords in Kathmandu Valley.
+                    </p>
+                    
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center text-gray-600">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Personalized property matching
+                        </li>
+                        <li class="flex items-center text-gray-600">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Direct landlord connections
+                        </li>
+                        <li class="flex items-center text-gray-600">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Free service for tenants
+                        </li>
+                    </ul>
+                    
+                    <a href="{% url 'services:find_room' %}" 
+                       class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition group-hover:translate-x-1 duration-300">
+                        Submit Your Requirements
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Shift Home Service -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden group hover:shadow-xl transition">
+                <div class="h-48 bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center">
+                    <svg class="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                    </svg>
+                </div>
+                <div class="p-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Shift Home</h3>
+                    <p class="text-gray-600 mb-6">
+                        Moving to a new place? Our trusted shifting partners will help you relocate 
+                        safely and efficiently. From packing to transportation, we've got you covered 
+                        within and around Kathmandu Valley.
+                    </p>
+                    
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center text-gray-600">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Professional packing service
+                        </li>
+                        <li class="flex items-center text-gray-600">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Safe transportation
+                        </li>
+                        <li class="flex items-center text-gray-600">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Competitive pricing
+                        </li>
+                    </ul>
+                    
+                    <a href="{% url 'services:shift_home' %}" 
+                       class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition group-hover:translate-x-1 duration-300">
+                        Get a Quote
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Simple steps to get started with our services</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-primary-600">1</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Submit Request</h3>
+                <p class="text-sm text-gray-600">Fill out the form with your requirements</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-primary-600">2</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">We Review</h3>
+                <p class="text-sm text-gray-600">Our team reviews and processes your request</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-primary-600">3</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Get Matched</h3>
+                <p class="text-sm text-gray-600">We connect you with the right options</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl font-bold text-primary-600">4</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Done!</h3>
+                <p class="text-sm text-gray-600">Complete your rental or moving journey</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+        <p class="text-gray-300 mb-8 max-w-2xl mx-auto">
+            Choose a service above or browse our property listings to find your next home in Kathmandu Valley.
+        </p>
+        <a href="{% url 'properties:list' %}" 
+           class="inline-flex items-center px-8 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition">
+            Browse Properties
+            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+            </svg>
+        </a>
+    </div>
+</section>
+{% endblock %}

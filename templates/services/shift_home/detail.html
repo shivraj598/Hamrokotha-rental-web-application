@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load core_tags %}
+
+{% block title %}Shift Request Details - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-6 text-sm">
+            <ol class="flex items-center space-x-2">
+                <li><a href="{% url 'services:home' %}" class="text-gray-500 hover:text-primary-600">Services</a></li>
+                <li><span class="text-gray-400">/</span></li>
+                <li><a href="{% url 'services:shift_home_list' %}" class="text-gray-500 hover:text-primary-600">My Requests</a></li>
+                <li><span class="text-gray-400">/</span></li>
+                <li class="text-gray-900 font-medium">Details</li>
+            </ol>
+        </nav>
+        
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-xl font-bold">Home Shifting Request</h1>
+                        <p class="text-green-100 mt-1">Submitted {{ request_obj.created_at|date:"M d, Y" }}</p>
+                    </div>
+                    <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full
+                          {% if request_obj.status == 'PENDING' %}bg-yellow-400 text-yellow-900
+                          {% elif request_obj.status == 'QUOTED' %}bg-blue-400 text-blue-900
+                          {% elif request_obj.status == 'CONFIRMED' %}bg-purple-400 text-purple-900
+                          {% elif request_obj.status == 'COMPLETED' %}bg-green-900 text-white
+                          {% else %}bg-red-400 text-white{% endif %}">
+                        {{ request_obj.get_status_display }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Route Visualization -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="text-center flex-1">
+                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="font-semibold text-gray-900">{{ request_obj.from_area }}</p>
+                            <p class="text-sm text-gray-500">{{ request_obj.get_from_district_display }}</p>
+                        </div>
+                        
+                        <div class="flex-shrink-0 px-4">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                            </svg>
+                        </div>
+                        
+                        <div class="text-center flex-1">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="font-semibold text-gray-900">{{ request_obj.to_area }}</p>
+                            <p class="text-sm text-gray-500">{{ request_obj.get_to_district_display }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Shift Details -->
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Shift Details</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-500">Shift Type</p>
+                            <p class="font-medium text-gray-900">{{ request_obj.get_shift_type_display }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-500">Property Size</p>
+                            <p class="font-medium text-gray-900">{{ request_obj.get_property_size_display }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-500">Preferred Date</p>
+                            <p class="font-medium text-gray-900">{{ request_obj.preferred_date|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Addresses -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-2 flex items-center text-red-600">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            </svg>
+                            Pickup Address
+                        </h3>
+                        <div class="bg-red-50 rounded-lg p-4">
+                            <p class="text-gray-900">{{ request_obj.from_address }}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-2 flex items-center text-green-600">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            </svg>
+                            Delivery Address
+                        </h3>
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <p class="text-gray-900">{{ request_obj.to_address }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Services -->
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Additional Information</h2>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        {% if request_obj.has_heavy_items %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-orange-100 text-orange-800">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                Heavy Items
+                            </span>
+                        {% endif %}
+                        {% if request_obj.needs_packing %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                                </svg>
+                                Packing Service
+                            </span>
+                        {% endif %}
+                        {% if request_obj.flexible_date %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                Flexible Date
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if request_obj.special_items %}
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <p class="text-sm text-gray-500 mb-1">Special Items</p>
+                            <p class="text-gray-900">{{ request_obj.special_items }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if request_obj.additional_notes %}
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-500 mb-1">Additional Notes</p>
+                            <p class="text-gray-900">{{ request_obj.additional_notes }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Pricing -->
+                {% if request_obj.estimated_cost or request_obj.final_cost %}
+                    <div class="border-t border-gray-200 pt-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-3">Pricing</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% if request_obj.estimated_cost %}
+                                <div class="bg-blue-50 rounded-lg p-4">
+                                    <p class="text-sm text-blue-600">Estimated Cost</p>
+                                    <p class="text-xl font-bold text-blue-800">{{ request_obj.estimated_cost|npr }}</p>
+                                </div>
+                            {% endif %}
+                            {% if request_obj.final_cost %}
+                                <div class="bg-green-50 rounded-lg p-4">
+                                    <p class="text-sm text-green-600">Final Cost</p>
+                                    <p class="text-xl font-bold text-green-800">{{ request_obj.final_cost|npr }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Status Info -->
+                <div class="border-t border-gray-200 pt-6">
+                    {% if request_obj.status == 'PENDING' %}
+                        <div class="bg-yellow-50 rounded-lg p-4">
+                            <p class="text-yellow-800">
+                                <strong>Status:</strong> Your request is pending review. We'll send you a quote within 24 hours.
+                            </p>
+                        </div>
+                    {% elif request_obj.status == 'QUOTED' %}
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <p class="text-blue-800">
+                                <strong>Status:</strong> We've sent you a quote! Please confirm to proceed with the booking.
+                            </p>
+                        </div>
+                    {% elif request_obj.status == 'CONFIRMED' %}
+                        <div class="bg-purple-50 rounded-lg p-4">
+                            <p class="text-purple-800">
+                                <strong>Status:</strong> Your booking is confirmed! Our team will arrive on the scheduled date.
+                            </p>
+                        </div>
+                    {% elif request_obj.status == 'COMPLETED' %}
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <p class="text-green-800">
+                                <strong>Status:</strong> Your home shifting has been completed successfully! Thank you for choosing us.
+                            </p>
+                        </div>
+                    {% else %}
+                        <div class="bg-red-50 rounded-lg p-4">
+                            <p class="text-red-800">
+                                <strong>Status:</strong> This request has been cancelled.
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 text-center">
+            <a href="{% url 'services:shift_home_list' %}" class="text-primary-600 hover:text-primary-700">
+                ← Back to My Requests
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load core_tags %}
+
+{% block title %}My Shift Home Requests - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">My Shift Home Requests</h1>
+                <p class="text-gray-600">Track your home shifting requests</p>
+            </div>
+            <a href="{% url 'services:shift_home' %}" 
+               class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                New Request
+            </a>
+        </div>
+        
+        {% if requests %}
+            <div class="space-y-4">
+                {% for req in requests %}
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition">
+                        <div class="p-6">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <h3 class="font-semibold text-gray-900">
+                                            {{ req.from_area }} → {{ req.to_area }}
+                                        </h3>
+                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full
+                                              {% if req.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                                              {% elif req.status == 'QUOTED' %}bg-blue-100 text-blue-800
+                                              {% elif req.status == 'CONFIRMED' %}bg-purple-100 text-purple-800
+                                              {% elif req.status == 'COMPLETED' %}bg-green-100 text-green-800
+                                              {% else %}bg-red-100 text-red-800{% endif %}">
+                                            {{ req.get_status_display }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                        <div>
+                                            <p class="text-gray-500">Type</p>
+                                            <p class="font-medium text-gray-900">{{ req.get_shift_type_display }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-500">Size</p>
+                                            <p class="font-medium text-gray-900">{{ req.get_property_size_display }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-500">Date</p>
+                                            <p class="font-medium text-gray-900">{{ req.preferred_date|date:"M d, Y" }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-500">
+                                                {% if req.final_cost %}
+                                                    Final Cost
+                                                {% elif req.estimated_cost %}
+                                                    Quoted
+                                                {% else %}
+                                                    Cost
+                                                {% endif %}
+                                            </p>
+                                            <p class="font-medium text-gray-900">
+                                                {% if req.final_cost %}
+                                                    {{ req.final_cost|npr }}
+                                                {% elif req.estimated_cost %}
+                                                    {{ req.estimated_cost|npr }}
+                                                {% else %}
+                                                    Pending
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <a href="{% url 'services:shift_home_detail' req.pk %}" 
+                                   class="ml-4 text-primary-600 hover:text-primary-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <div class="mt-8 flex justify-center">
+                    <nav class="flex items-center gap-2">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}" 
+                               class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                Previous
+                            </a>
+                        {% endif %}
+                        
+                        <span class="px-4 py-2 text-gray-600">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" 
+                               class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                Next
+                            </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="bg-white rounded-xl shadow-md p-12 text-center">
+                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No Requests Yet</h3>
+                <p class="text-gray-500 mb-6">You haven't submitted any home shifting requests yet.</p>
+                <a href="{% url 'services:shift_home' %}" 
+                   class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">
+                    Get a Quote
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

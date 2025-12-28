@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load core_tags %}
+
+{% block title %}Request Submitted - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-16">
+    <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-xl shadow-md p-8 text-center">
+            <!-- Success Icon -->
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Request Submitted!</h1>
+            <p class="text-gray-600 mb-6">
+                Thank you for your home shifting request. We'll prepare a quote and get back to you soon.
+            </p>
+            
+            <!-- Request Summary -->
+            <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+                <h3 class="font-semibold text-gray-900 mb-3">Request Summary</h3>
+                <dl class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Request ID:</dt>
+                        <dd class="font-mono text-gray-900">{{ request_obj.id|slice:":8" }}...</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Shift Type:</dt>
+                        <dd class="text-gray-900">{{ request_obj.get_shift_type_display }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Property Size:</dt>
+                        <dd class="text-gray-900">{{ request_obj.get_property_size_display }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Route:</dt>
+                        <dd class="text-gray-900">{{ request_obj.from_area }} → {{ request_obj.to_area }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Preferred Date:</dt>
+                        <dd class="text-gray-900">{{ request_obj.preferred_date|date:"M d, Y" }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Status:</dt>
+                        <dd class="text-yellow-600 font-medium">{{ request_obj.get_status_display }}</dd>
+                    </div>
+                </dl>
+            </div>
+            
+            <!-- What's Next -->
+            <div class="bg-green-50 rounded-lg p-4 mb-6 text-left">
+                <h3 class="font-semibold text-green-800 mb-2">What's Next?</h3>
+                <ul class="text-sm text-green-700 space-y-1">
+                    <li>• We'll review your request and estimate costs</li>
+                    <li>• We'll send you a detailed quote via email/phone</li>
+                    <li>• Once confirmed, we'll schedule the shift</li>
+                </ul>
+            </div>
+            
+            <!-- Actions -->
+            <div class="space-y-3">
+                <a href="{% url 'services:shift_home_list' %}" 
+                   class="block w-full py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition">
+                    View My Requests
+                </a>
+                <a href="{% url 'services:home' %}" 
+                   class="block w-full py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+                    Back to Services
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

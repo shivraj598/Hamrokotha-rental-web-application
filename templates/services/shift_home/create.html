@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Shift Home - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900">Home Shifting Service</h1>
+            <p class="text-gray-600 mt-2">Fill in the details and get a quote for your move</p>
+        </div>
+        
+        <!-- Form -->
+        <div class="bg-white rounded-xl shadow-md p-6 md:p-8">
+            <form method="post" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Contact Information -->
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-sm font-bold mr-3">1</span>
+                        Contact Information
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="id_name" class="block text-sm font-medium text-gray-700 mb-1">
+                                Full Name <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.name }}
+                        </div>
+                        <div>
+                            <label for="id_email" class="block text-sm font-medium text-gray-700 mb-1">
+                                Email <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.email }}
+                        </div>
+                        <div>
+                            <label for="id_phone" class="block text-sm font-medium text-gray-700 mb-1">
+                                Phone <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.phone }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Shift Details -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-sm font-bold mr-3">2</span>
+                        Shift Details
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_shift_type" class="block text-sm font-medium text-gray-700 mb-1">
+                                Shift Type <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.shift_type }}
+                        </div>
+                        <div>
+                            <label for="id_property_size" class="block text-sm font-medium text-gray-700 mb-1">
+                                Property Size <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.property_size }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- From Location -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <span class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-sm font-bold mr-3">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            </svg>
+                        </span>
+                        Pickup Location (From)
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_from_district" class="block text-sm font-medium text-gray-700 mb-1">
+                                District <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.from_district }}
+                        </div>
+                        <div>
+                            <label for="id_from_area" class="block text-sm font-medium text-gray-700 mb-1">
+                                Area <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.from_area }}
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="id_from_address" class="block text-sm font-medium text-gray-700 mb-1">
+                                Full Address <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.from_address }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- To Location -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-sm font-bold mr-3">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            </svg>
+                        </span>
+                        Delivery Location (To)
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_to_district" class="block text-sm font-medium text-gray-700 mb-1">
+                                District <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.to_district }}
+                        </div>
+                        <div>
+                            <label for="id_to_area" class="block text-sm font-medium text-gray-700 mb-1">
+                                Area <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.to_area }}
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="id_to_address" class="block text-sm font-medium text-gray-700 mb-1">
+                                Full Address <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.to_address }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Schedule -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-sm font-bold mr-3">3</span>
+                        Preferred Schedule
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="id_preferred_date" class="block text-sm font-medium text-gray-700 mb-1">
+                                Preferred Date <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.preferred_date }}
+                        </div>
+                        <div>
+                            <label for="id_preferred_time" class="block text-sm font-medium text-gray-700 mb-1">
+                                Preferred Time
+                            </label>
+                            {{ form.preferred_time }}
+                        </div>
+                        <div class="flex items-end">
+                            <label class="flex items-center gap-2 pb-2">
+                                {{ form.flexible_date }}
+                                <span class="text-sm text-gray-700">I'm flexible with dates</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Services -->
+                <div class="border-t border-gray-200 pt-8">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-sm font-bold mr-3">4</span>
+                        Additional Information
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex flex-wrap gap-6">
+                            <label class="flex items-center gap-2">
+                                {{ form.has_heavy_items }}
+                                <span class="text-sm text-gray-700">I have heavy items (refrigerator, washing machine, etc.)</span>
+                            </label>
+                            <label class="flex items-center gap-2">
+                                {{ form.needs_packing }}
+                                <span class="text-sm text-gray-700">I need packing service</span>
+                            </label>
+                        </div>
+                        
+                        <div>
+                            <label for="id_special_items" class="block text-sm font-medium text-gray-700 mb-1">
+                                Special Items (if any)
+                            </label>
+                            {{ form.special_items }}
+                            <p class="mt-1 text-xs text-gray-500">Items that need special care during transport</p>
+                        </div>
+                        
+                        <div>
+                            <label for="id_additional_notes" class="block text-sm font-medium text-gray-700 mb-1">
+                                Additional Notes
+                            </label>
+                            {{ form.additional_notes }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit -->
+                <div class="border-t border-gray-200 pt-6">
+                    <button type="submit" 
+                            class="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">
+                        Get Quote
+                    </button>
+                    <p class="text-center text-sm text-gray-500 mt-4">
+                        We'll review your request and send you a quote within 24 hours.
+                    </p>
+                </div>
+            </form>
+        </div>
+        
+        <div class="mt-6 text-center">
+            <a href="{% url 'services:home' %}" class="text-primary-600 hover:text-primary-700">
+                ← Back to Services
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
