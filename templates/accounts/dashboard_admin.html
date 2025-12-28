@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load core_tags %}
+
+{% block title %}Admin Dashboard - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+                <p class="text-gray-600">Review and manage properties, users, and inquiries</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex gap-3">
+                <a href="{% url 'admin_panel:dashboard' %}" 
+                   class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Full Admin Panel
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Pending Review</p>
+                        <p class="text-2xl font-bold text-orange-600">{{ pending_count }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Approved</p>
+                        <p class="text-2xl font-bold text-green-600">{{ approved_count }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Total Users</p>
+                        <p class="text-2xl font-bold text-blue-600">{{ total_users }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Inquiries</p>
+                        <p class="text-2xl font-bold text-purple-600">{{ total_inquiries }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Properties Section -->
+        <div class="bg-white rounded-xl shadow-sm mb-8">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">
+                    Properties Pending Review
+                    {% if pending_count > 0 %}
+                        <span class="ml-2 px-2 py-1 bg-orange-100 text-orange-600 text-sm rounded-full">{{ pending_count }}</span>
+                    {% endif %}
+                </h2>
+                <a href="{% url 'admin_panel:properties' %}?status=PENDING" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                    View All →
+                </a>
+            </div>
+            
+            {% if pending_properties %}
+                <div class="divide-y divide-gray-200">
+                    {% for property in pending_properties %}
+                        <div class="p-6 hover:bg-gray-50 transition">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start space-x-4">
+                                    {% if property.images.first %}
+                                        <img src="{{ property.images.first.image.url }}" alt="{{ property.title }}"
+                                             class="w-20 h-20 object-cover rounded-lg">
+                                    {% else %}
+                                        <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">{{ property.title }}</h3>
+                                        <p class="text-sm text-gray-500">{{ property.area }}, {{ property.get_district_display }}</p>
+                                        <p class="text-sm text-gray-500">Rs. {{ property.price_per_month|floatformat:0 }}/month • {{ property.bedrooms }} beds</p>
+                                        <p class="text-xs text-gray-400 mt-1">
+                                            Posted by {{ property.owner.get_full_name|default:property.owner.email }} • {{ property.created_at|timesince }} ago
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <a href="{% url 'properties:detail' property.pk %}" target="_blank"
+                                       class="px-3 py-1 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                        View
+                                    </a>
+                                    <form action="{% url 'admin_panel:approve_property' property.pk %}" method="post" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" 
+                                                class="px-3 py-1 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700">
+                                            Approve
+                                        </button>
+                                    </form>
+                                    <form action="{% url 'admin_panel:reject_property' property.pk %}" method="post" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="px-3 py-1 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700">
+                                            Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="p-12 text-center">
+                    <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900">All Caught Up!</h3>
+                    <p class="text-gray-500 mt-1">No properties pending review at the moment.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Properties & Quick Stats -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Recent Properties -->
+            <div class="bg-white rounded-xl shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-gray-900">Recent Properties</h2>
+                    <a href="{% url 'admin_panel:properties' %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                        View All →
+                    </a>
+                </div>
+                <div class="divide-y divide-gray-200">
+                    {% for property in recent_properties %}
+                        <div class="px-6 py-4 flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium text-gray-900">{{ property.title|truncatechars:30 }}</h3>
+                                <p class="text-sm text-gray-500">{{ property.owner.email }}</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                  {% if property.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                                  {% elif property.status == 'APPROVED' %}bg-green-100 text-green-800
+                                  {% elif property.status == 'REJECTED' %}bg-red-100 text-red-800
+                                  {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {{ property.get_status_display }}
+                            </span>
+                        </div>
+                    {% empty %}
+                        <div class="px-6 py-8 text-center text-gray-500">
+                            No properties yet.
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="bg-white rounded-xl shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Platform Overview</h2>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                        <span class="text-gray-600">Total Properties</span>
+                        <span class="font-semibold text-gray-900">{{ total_properties }}</span>
+                    </div>
+                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                        <span class="text-gray-600">Landlords</span>
+                        <span class="font-semibold text-gray-900">{{ total_landlords }}</span>
+                    </div>
+                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                        <span class="text-gray-600">Tenants</span>
+                        <span class="font-semibold text-gray-900">{{ total_tenants }}</span>
+                    </div>
+                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                        <span class="text-gray-600">Pending Inquiries</span>
+                        <span class="font-semibold text-orange-600">{{ pending_inquiries }}</span>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <a href="{% url 'admin_panel:analytics' %}" 
+                           class="w-full inline-flex items-center justify-center px-4 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            View Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

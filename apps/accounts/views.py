@@ -148,7 +148,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     
     def get_template_names(self):
         user = self.request.user
-        if user.is_landlord:
+        # Staff/admin users get the admin dashboard
+        if user.is_staff or user.is_superuser:
+            return ['accounts/dashboard_admin.html']
+        elif user.is_landlord:
             return ['accounts/dashboard_landlord.html']
         elif user.is_tenant:
             return ['accounts/dashboard_tenant.html']
@@ -158,7 +161,38 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
-        if user.is_landlord:
+        # Admin/Staff dashboard - show all properties pending review
+        if user.is_staff or user.is_superuser:
+            from apps.properties.models import Property
+            from apps.inquiries.models import Inquiry
+            from apps.accounts.models import User
+            
+            # All pending properties for review
+            context['pending_properties'] = Property.objects.filter(
+                status=PropertyStatus.PENDING
+            ).select_related('owner').order_by('-created_at')
+            context['pending_count'] = context['pending_properties'].count()
+            
+            # All approved properties
+            context['approved_properties'] = Property.objects.filter(
+                status=PropertyStatus.APPROVED
+            ).select_related('owner').order_by('-created_at')[:5]
+            context['approved_count'] = Property.objects.filter(status=PropertyStatus.APPROVED).count()
+            
+            # Recent properties
+            context['recent_properties'] = Property.objects.select_related('owner').order_by('-created_at')[:5]
+            context['total_properties'] = Property.objects.count()
+            
+            # User stats
+            context['total_users'] = User.objects.count()
+            context['total_landlords'] = User.objects.filter(user_type='LANDLORD').count()
+            context['total_tenants'] = User.objects.filter(user_type='TENANT').count()
+            
+            # Inquiry stats
+            context['total_inquiries'] = Inquiry.objects.count()
+            context['pending_inquiries'] = Inquiry.objects.filter(status='PENDING').count()
+        
+        elif user.is_landlord:
             from apps.properties.models import Property
             from apps.inquiries.models import Inquiry
             
