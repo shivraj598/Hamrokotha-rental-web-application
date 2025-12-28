@@ -80,3 +80,26 @@ def percentage(value, total):
         return round((float(value) / float(total)) * 100, 1)
     except (ValueError, TypeError, ZeroDivisionError):
         return 0
+
+
+@register.simple_tag(takes_context=True)
+def query_string(context, **kwargs):
+    """
+    Build a query string with updated parameters.
+    Usage: {% query_string page=2 %} -> "page=2&existing_param=value"
+    """
+    request = context.get('request')
+    if request is None:
+        return ''
+    
+    # Copy current query parameters
+    params = request.GET.copy()
+    
+    # Update with new parameters
+    for key, value in kwargs.items():
+        if value is None or value == '':
+            params.pop(key, None)
+        else:
+            params[key] = value
+    
+    return params.urlencode()
