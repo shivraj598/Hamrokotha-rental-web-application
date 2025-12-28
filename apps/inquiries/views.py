@@ -67,8 +67,11 @@ class InquiryListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
         
+        # Admin/staff see all inquiries
+        if user.is_staff or user.is_superuser:
+            queryset = Inquiry.objects.all()
         # Landlords see inquiries on their properties
-        if user.user_type == 'LANDLORD':
+        elif user.user_type == 'LANDLORD':
             queryset = Inquiry.objects.filter(rental_property__owner=user)
         # Tenants see their sent inquiries
         else:
@@ -95,7 +98,10 @@ class InquiryListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
-        if user.user_type == 'LANDLORD':
+        # Admin/staff see stats for all inquiries
+        if user.is_staff or user.is_superuser:
+            base_qs = Inquiry.objects.all()
+        elif user.user_type == 'LANDLORD':
             base_qs = Inquiry.objects.filter(rental_property__owner=user)
         else:
             base_qs = Inquiry.objects.filter(sender=user)
@@ -117,6 +123,9 @@ class InquiryDetailView(LoginRequiredMixin, DetailView):
     
     def get_queryset(self):
         user = self.request.user
+        # Admin/staff can view all inquiries
+        if user.is_staff or user.is_superuser:
+            return Inquiry.objects.select_related('rental_property', 'sender', 'rental_property__owner')
         # User can view if they're the sender or the landlord
         return Inquiry.objects.filter(
             Q(sender=user) | Q(rental_property__owner=user)
