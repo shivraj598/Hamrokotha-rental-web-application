@@ -1,0 +1,23 @@
+# Django and Core Dependencies
+Django>=5.0,<6.0
+psycopg2-binary>=2.9.9
+Pillow>=10.0.0
+
+# Django Extensions
+django-crispy-forms>=2.1
+crispy-tailwind>=1.0.0
+django-filter>=23.5
+python-decouple>=3.8
+
+# Django REST Framework (for API endpoints)
+djangorestframework>=3.14.0
+
+# Development Tools
+django-debug-toolbar>=4.2.0
+
+# Production
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+
+# Import/Export for Admin
+django-import-export>=3.3.0
