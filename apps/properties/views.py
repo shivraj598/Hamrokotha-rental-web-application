@@ -161,10 +161,10 @@ class PropertyDetailView(DetailView):
 
 
 class LandlordRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
-    """Mixin to ensure user is a landlord."""
+    """Mixin to ensure user is a landlord or admin."""
     
     def test_func(self):
-        return self.request.user.is_landlord
+        return self.request.user.is_landlord or self.request.user.is_staff or self.request.user.is_superuser
     
     def handle_no_permission(self):
         messages.error(self.request, "Only landlords can perform this action.")
@@ -210,11 +210,12 @@ class PropertyCreateView(LandlordRequiredMixin, SuccessMessageMixin, CreateView)
 
 
 class PropertyOwnerMixin(LoginRequiredMixin, UserPassesTestMixin):
-    """Mixin to ensure user owns the property."""
+    """Mixin to ensure user owns the property or is admin."""
     
     def test_func(self):
         property_obj = self.get_object()
-        return self.request.user == property_obj.owner
+        user = self.request.user
+        return user == property_obj.owner or user.is_staff or user.is_superuser
     
     def handle_no_permission(self):
         messages.error(self.request, "You don't have permission to edit this property.")
