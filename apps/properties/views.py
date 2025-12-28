@@ -161,13 +161,17 @@ class PropertyDetailView(DetailView):
 
 
 class LandlordRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
-    """Mixin to ensure user is a landlord or admin."""
+    """Mixin to ensure user is a landlord (not admin). Admins can only approve/reject, not create."""
     
     def test_func(self):
-        return self.request.user.is_landlord or self.request.user.is_staff or self.request.user.is_superuser
+        # Only landlords can create/edit properties, NOT admins
+        return self.request.user.is_landlord and not (self.request.user.is_staff or self.request.user.is_superuser)
     
     def handle_no_permission(self):
-        messages.error(self.request, "Only landlords can perform this action.")
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            messages.error(self.request, "Admins cannot create properties. You can only approve or reject listings.")
+        else:
+            messages.error(self.request, "Only landlords can perform this action.")
         return redirect('accounts:dashboard')
 
 
