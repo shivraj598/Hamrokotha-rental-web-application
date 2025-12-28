@@ -335,13 +335,13 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 **Shivraj Timilsena**
 - GitHub: [@shivrajtimilsena](https://github.com/shivrajtimilsena)
-- Email: shivraj@example.com
+- Email: timilsenashivraj598@gmail.com
 
 ## 📧 Support & Contact
 
 For questions, issues, or suggestions:
 - Open an issue on GitHub
-- Email: support@hamrokotha.com
+- Email: timilsenashivraj598@gmail.com
 - Visit: www.hamrokotha.com
 
 ## 🙏 Acknowledgments
