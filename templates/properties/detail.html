@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+{% load core_tags %}
+
+{% block title %}{{ property.title }} - {{ SITE_NAME }}{% endblock %}
+
+{% block extra_head %}
+<meta property="og:title" content="{{ property.title }}">
+<meta property="og:description" content="{{ property.description|truncatewords:30 }}">
+{% if property.primary_image %}
+<meta property="og:image" content="{{ property.primary_image.image.url }}">
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-6 text-sm">
+            <ol class="flex items-center space-x-2 text-gray-500">
+                <li><a href="{% url 'core:home' %}" class="hover:text-primary-600">Home</a></li>
+                <li>/</li>
+                <li><a href="{% url 'properties:list' %}" class="hover:text-primary-600">Properties</a></li>
+                <li>/</li>
+                <li><a href="{% url 'properties:list' %}?district={{ property.district }}" class="hover:text-primary-600">{{ property.get_district_display }}</a></li>
+                <li>/</li>
+                <li class="text-gray-900 truncate max-w-[200px]">{{ property.title }}</li>
+            </ol>
+        </nav>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Image Gallery -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden" x-data="{ activeImage: 0 }">
+                    {% if property.images.exists %}
+                        <!-- Main Image -->
+                        <div class="relative h-96 bg-gray-100">
+                            {% for image in property.images.all %}
+                                <img x-show="activeImage === {{ forloop.counter0 }}"
+                                     src="{{ image.image.url }}" 
+                                     alt="{{ image.caption|default:property.title }}"
+                                     class="w-full h-full object-cover">
+                            {% endfor %}
+                            
+                            <!-- Navigation Arrows -->
+                            {% if property.images.count > 1 %}
+                                <button @click="activeImage = activeImage === 0 ? {{ property.images.count|add:'-1' }} : activeImage - 1"
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                </button>
+                                <button @click="activeImage = activeImage === {{ property.images.count|add:'-1' }} ? 0 : activeImage + 1"
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            {% endif %}
+                            
+                            <!-- Image Counter -->
+                            <div class="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-lg text-sm">
+                                <span x-text="activeImage + 1"></span> / {{ property.images.count }}
+                            </div>
+                        </div>
+                        
+                        <!-- Thumbnails -->
+                        {% if property.images.count > 1 %}
+                            <div class="p-4 flex gap-2 overflow-x-auto">
+                                {% for image in property.images.all %}
+                                    <button @click="activeImage = {{ forloop.counter0 }}"
+                                            class="w-20 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition"
+                                            :class="activeImage === {{ forloop.counter0 }} ? 'border-primary-500' : 'border-transparent'">
+                                        <img src="{{ image.image.url }}" 
+                                             alt="" 
+                                             class="w-full h-full object-cover">
+                                    </button>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="h-96 bg-gray-100 flex items-center justify-center">
+                            <svg class="w-24 h-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Property Details -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
+                                    {{ property.get_property_type_display }}
+                                </span>
+                                {% if property.is_featured %}
+                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">
+                                        Featured
+                                    </span>
+                                {% endif %}
+                                {% if property.negotiable %}
+                                    <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                                        Negotiable
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <h1 class="text-2xl font-bold text-gray-900">{{ property.title }}</h1>
+                            <p class="text-gray-600 flex items-center mt-1">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                {{ property.area }}, {{ property.get_district_display }}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-3xl font-bold text-primary-600">{{ property.price_per_month|npr }}</p>
+                            <p class="text-gray-500">per month</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-y border-gray-100">
+                        <div class="text-center">
+                            <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg mx-auto mb-2">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                            </div>
+                            <p class="font-semibold text-gray-900">{{ property.bedrooms }}</p>
+                            <p class="text-xs text-gray-500">Bedrooms</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg mx-auto mb-2">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
+                                </svg>
+                            </div>
+                            <p class="font-semibold text-gray-900">{{ property.bathrooms }}</p>
+                            <p class="text-xs text-gray-500">Bathrooms</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg mx-auto mb-2">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+                                </svg>
+                            </div>
+                            <p class="font-semibold text-gray-900">{% if property.area_sq_ft %}{{ property.area_sq_ft }}{% else %}N/A{% endif %}</p>
+                            <p class="text-xs text-gray-500">Sq. Ft.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-lg mx-auto mb-2">
+                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            <p class="font-semibold text-gray-900">{{ property.floor_number|default:"N/A" }}</p>
+                            <p class="text-xs text-gray-500">Floor</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="py-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-3">Description</h2>
+                        <div class="text-gray-600 prose max-w-none">
+                            {{ property.description|linebreaks }}
+                        </div>
+                    </div>
+                    
+                    <!-- Amenities -->
+                    {% if property.amenities %}
+                        <div class="py-6 border-t border-gray-100">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4">Amenities</h2>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {% for amenity in property.amenities_display %}
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-gray-700">{{ amenity }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Additional Details -->
+                    <div class="py-6 border-t border-gray-100">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Additional Details</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {% if property.security_deposit %}
+                                <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-600">Security Deposit</span>
+                                    <span class="font-medium">{{ property.security_deposit|npr }}</span>
+                                </div>
+                            {% endif %}
+                            <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                <span class="text-gray-600">Minimum Stay</span>
+                                <span class="font-medium">{{ property.minimum_stay_months }} months</span>
+                            </div>
+                            <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                <span class="text-gray-600">Parking</span>
+                                <span class="font-medium">{% if property.parking_available %}Available{% else %}Not Available{% endif %}</span>
+                            </div>
+                            <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                <span class="text-gray-600">Pets</span>
+                                <span class="font-medium">{% if property.pets_allowed %}Allowed{% else %}Not Allowed{% endif %}</span>
+                            </div>
+                            {% if property.preferred_tenant %}
+                                <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-600">Preferred Tenant</span>
+                                    <span class="font-medium">{{ property.preferred_tenant }}</span>
+                                </div>
+                            {% endif %}
+                            {% if property.available_from %}
+                                <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span class="text-gray-600">Available From</span>
+                                    <span class="font-medium">{{ property.available_from|date:"M d, Y" }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Location -->
+                    <div class="py-6 border-t border-gray-100">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Location</h2>
+                        <p class="text-gray-600 mb-4">{{ property.address }}</p>
+                        {% if property.google_maps_link %}
+                            <a href="{{ property.google_maps_link }}" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="inline-flex items-center text-primary-600 hover:text-primary-700">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                View on Google Maps
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Owner Info & Inquiry -->
+                <div class="bg-white rounded-xl shadow-md p-6 sticky top-4">
+                    <!-- Owner Info -->
+                    <div class="flex items-center mb-6 pb-6 border-b border-gray-100">
+                        <div class="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-xl">
+                            {% if property.owner.profile_picture %}
+                                <img src="{{ property.owner.profile_picture.url }}" alt="" class="w-full h-full rounded-full object-cover">
+                            {% else %}
+                                {{ property.owner.first_name|first|upper }}{{ property.owner.last_name|first|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="ml-4">
+                            <p class="font-semibold text-gray-900">{{ property.owner.get_full_name|default:property.owner.username }}</p>
+                            <p class="text-sm text-gray-500">Property Owner</p>
+                            {% if property.owner.is_verified %}
+                                <span class="inline-flex items-center text-xs text-green-600">
+                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Verified
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    {% if user.is_authenticated %}
+                        {% if user == property.owner %}
+                            <div class="space-y-3">
+                                <a href="{% url 'properties:edit' property.pk %}" 
+                                   class="w-full py-3 border border-primary-600 text-primary-600 rounded-lg font-medium hover:bg-primary-50 transition flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    Edit Property
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="space-y-3">
+                                <a href="{% url 'inquiries:create' property.pk %}" 
+                                   class="w-full py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                    </svg>
+                                    Send Inquiry
+                                </a>
+                                
+                                <form action="{% url 'properties:toggle_favorite' property.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="w-full py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center
+                                                   {% if is_favorited %}text-red-600 border-red-300{% else %}text-gray-700{% endif %}">
+                                        <svg class="w-5 h-5 mr-2" fill="{% if is_favorited %}currentColor{% else %}none{% endif %}" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                        </svg>
+                                        {% if is_favorited %}Remove from Favorites{% else %}Save to Favorites{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="space-y-3">
+                            <a href="{% url 'accounts:login' %}?next={{ request.path }}" 
+                               class="w-full py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition flex items-center justify-center">
+                                Login to Send Inquiry
+                            </a>
+                            <p class="text-sm text-center text-gray-500">
+                                Don't have an account? 
+                                <a href="{% url 'accounts:register' %}" class="text-primary-600 hover:underline">Register</a>
+                            </p>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Stats -->
+                    <div class="mt-6 pt-6 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            {{ property.views_count }} views
+                        </span>
+                        <span>Listed {{ property.created_at|timesince }} ago</span>
+                    </div>
+                </div>
+                
+                <!-- Safety Tips -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+                    <h3 class="font-semibold text-yellow-800 mb-3 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        Safety Tips
+                    </h3>
+                    <ul class="text-sm text-yellow-700 space-y-2">
+                        <li>• Visit the property in person before making any payment</li>
+                        <li>• Don't pay any money before signing a rental agreement</li>
+                        <li>• Verify the landlord's identity and ownership documents</li>
+                        <li>• Report suspicious listings to us immediately</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Properties -->
+        {% if related_properties %}
+            <div class="mt-12">
+                <h2 class="text-xl font-bold text-gray-900 mb-6">Similar Properties in {{ property.get_district_display }}</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {% for property in related_properties %}
+                        {% include 'includes/property_card.html' %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

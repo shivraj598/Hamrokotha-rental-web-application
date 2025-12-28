@@ -8,21 +8,21 @@ from . import views
 app_name = 'properties'
 
 urlpatterns = [
-    # Property listings
+    # Public views
     path('', views.PropertyListView.as_view(), name='list'),
-    path('search/', views.PropertySearchView.as_view(), name='search'),
-    path('<int:pk>/', views.PropertyDetailView.as_view(), name='detail'),
+    path('<uuid:pk>/', views.PropertyDetailView.as_view(), name='detail'),
     
-    # Landlord property management
-    path('add/', views.PropertyCreateView.as_view(), name='add'),
-    path('<int:pk>/edit/', views.PropertyUpdateView.as_view(), name='edit'),
-    path('<int:pk>/delete/', views.PropertyDeleteView.as_view(), name='delete'),
-    path('<int:pk>/mark-rented/', views.MarkAsRentedView.as_view(), name='mark_rented'),
+    # Landlord views
+    path('create/', views.PropertyCreateView.as_view(), name='create'),
+    path('<uuid:pk>/edit/', views.PropertyUpdateView.as_view(), name='edit'),
+    path('<uuid:pk>/delete/', views.PropertyDeleteView.as_view(), name='delete'),
+    path('my-properties/', views.MyPropertiesView.as_view(), name='my_properties'),
+    
+    # Property status
+    path('<uuid:pk>/mark-rented/', views.MarkAsRentedView.as_view(), name='mark_rented'),
+    path('<uuid:pk>/mark-available/', views.MarkAsAvailableView.as_view(), name='mark_available'),
     
     # Favorites
-    path('favorites/', views.FavoritesListView.as_view(), name='favorites'),
-    path('<int:pk>/favorite/', views.ToggleFavoriteView.as_view(), name='toggle_favorite'),
-    
-    # API endpoints
-    path('api/areas/<str:district>/', views.AreasAPIView.as_view(), name='api_areas'),
+    path('favorites/', views.FavoriteListView.as_view(), name='favorites'),
+    path('<uuid:pk>/toggle-favorite/', views.ToggleFavoriteView.as_view(), name='toggle_favorite'),
 ]

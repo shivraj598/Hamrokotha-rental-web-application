@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}List Your Property - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900">List Your Property</h1>
+            <p class="text-gray-600">Fill in the details below to list your property for rent</p>
+        </div>
+        
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Basic Information -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6 pb-4 border-b border-gray-100">
+                    Basic Information
+                </h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Property Title <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Description <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.description }}
+                        <p class="mt-1 text-sm text-gray-500">Describe the property in detail - features, surroundings, etc.</p>
+                        {% if form.description.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.property_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Property Type <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.property_type }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Location -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6 pb-4 border-b border-gray-100">
+                    Location
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.district.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            District <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.district }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.area.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Area/Locality <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.area }}
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Full Address <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.address }}
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label for="{{ form.google_maps_link.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Google Maps Link (Optional)
+                        </label>
+                        {{ form.google_maps_link }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pricing -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6 pb-4 border-b border-gray-100">
+                    Pricing
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.price_per_month.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Monthly Rent (Rs.) <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.price_per_month }}
+                        {% if form.price_per_month.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.price_per_month.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.security_deposit.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Security Deposit (Rs.)
+                        </label>
+                        {{ form.security_deposit }}
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <label class="inline-flex items-center">
+                            {{ form.negotiable }}
+                            <span class="ml-2 text-sm text-gray-700">Price is negotiable</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Property Details -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6 pb-4 border-b border-gray-100">
+                    Property Details
+                </h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label for="{{ form.bedrooms.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Bedrooms
+                        </label>
+                        {{ form.bedrooms }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.bathrooms.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Bathrooms
+                        </label>
+                        {{ form.bathrooms }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.floor_number.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Floor
+                        </label>
+                        {{ form.floor_number }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.total_floors.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Total Floors
+                        </label>
+                        {{ form.total_floors }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.area_sq_ft.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Area (sq. ft.)
+                        </label>
+                        {{ form.area_sq_ft }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Amenities -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6 pb-4 border-b border-gray-100">
+                    Amenities
+                </h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {% for choice in form.amenities %}
+                        <label class="inline-flex items-center">
+                            {{ choice.tag }}
+                            <span class="ml-2 text-sm text-gray-700">{{ choice.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-6 pt-6 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="inline-flex items-center">
+                        {{ form.parking_available }}
+                        <span class="ml-2 text-sm text-gray-700">Parking Available</span>
+                    </label>
+                    
+                    <label class="inline-flex items-center">
+                        {{ form.pets_allowed }}
+                        <span class="ml-2 text-sm text-gray-700">Pets Allowed</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Preferences -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6 pb-4 border-b border-gray-100">
+                    Preferences
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="{{ form.preferred_tenant.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Preferred Tenant
+                        </label>
+                        {{ form.preferred_tenant }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.available_from.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Available From
+                        </label>
+                        {{ form.available_from }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.minimum_stay_months.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Minimum Stay (months)
+                        </label>
+                        {{ form.minimum_stay_months }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Images -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6 pb-4 border-b border-gray-100">
+                    Property Images
+                </h2>
+                
+                <p class="text-sm text-gray-500 mb-4">Upload up to 10 images of your property. First image will be the cover photo.</p>
+                
+                {{ image_formset.management_form }}
+                
+                <div class="space-y-4">
+                    {% for image_form in image_formset %}
+                        <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
+                            <div class="flex-1">
+                                {{ image_form.image }}
+                            </div>
+                            <div class="flex-1">
+                                {{ image_form.caption }}
+                            </div>
+                            <label class="inline-flex items-center">
+                                {{ image_form.is_primary }}
+                                <span class="ml-2 text-sm text-gray-700">Primary</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Submit -->
+            <div class="flex items-center justify-between p-6 bg-white rounded-xl shadow-md">
+                <a href="{% url 'accounts:dashboard' %}" class="text-gray-600 hover:text-gray-800">
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="px-8 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition">
+                    Submit for Review
+                </button>
+            </div>
+            
+            <p class="text-sm text-center text-gray-500">
+                Your property will be reviewed by our team and published within 24-48 hours.
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock %}

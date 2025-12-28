@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Property - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+            <!-- Warning Icon -->
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Delete Property?</h2>
+            <p class="text-gray-600 mb-6">
+                Are you sure you want to delete "<strong>{{ object.title }}</strong>"? This action cannot be undone.
+            </p>
+            
+            <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+                <p class="text-sm text-gray-600">
+                    <strong>Property:</strong> {{ object.title }}<br>
+                    <strong>Location:</strong> {{ object.area }}, {{ object.get_district_display }}<br>
+                    <strong>Price:</strong> Rs. {{ object.price_per_month|floatformat:0 }}/month
+                </p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="flex gap-4">
+                    <a href="{% url 'properties:detail' object.pk %}" 
+                       class="flex-1 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="flex-1 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition">
+                        Delete Property
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
