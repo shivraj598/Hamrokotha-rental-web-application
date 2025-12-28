@@ -77,10 +77,10 @@ class InquiryListView(LoginRequiredMixin, ListView):
         else:
             queryset = Inquiry.objects.filter(sender=user)
         
-        # Apply filters
+        # Apply filters (case-insensitive)
         status = self.request.GET.get('status')
         if status:
-            queryset = queryset.filter(status=status)
+            queryset = queryset.filter(status__iexact=status)
         
         read_status = self.request.GET.get('read_status')
         if read_status == 'unread':

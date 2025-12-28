@@ -41,15 +41,15 @@ class PropertyListView(ListView):
                 Q(address__icontains=q)
             )
         
-        # Filter by district
+        # Filter by district (case-insensitive)
         district = self.request.GET.get('district')
         if district:
-            queryset = queryset.filter(district=district)
+            queryset = queryset.filter(district__iexact=district)
         
-        # Filter by property type
+        # Filter by property type (case-insensitive)
         property_type = self.request.GET.get('property_type')
         if property_type:
-            queryset = queryset.filter(property_type=property_type)
+            queryset = queryset.filter(property_type__iexact=property_type)
         
         # Filter by price range
         min_price = self.request.GET.get('min_price')

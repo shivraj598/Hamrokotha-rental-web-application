@@ -88,14 +88,14 @@ class PropertyManagementView(AdminRequiredMixin, ListView):
     def get_queryset(self):
         queryset = Property.objects.select_related('owner').order_by('-created_at')
         
-        # Filters
+        # Filters (case-insensitive)
         status = self.request.GET.get('status')
         if status:
-            queryset = queryset.filter(status=status)
+            queryset = queryset.filter(status__iexact=status)
         
         district = self.request.GET.get('district')
         if district:
-            queryset = queryset.filter(district=district)
+            queryset = queryset.filter(district__iexact=district)
         
         search = self.request.GET.get('search')
         if search:
@@ -162,9 +162,10 @@ class UserManagementView(AdminRequiredMixin, ListView):
     def get_queryset(self):
         queryset = User.objects.order_by('-date_joined')
         
+        # Case-insensitive filter
         user_type = self.request.GET.get('user_type')
         if user_type:
-            queryset = queryset.filter(user_type=user_type)
+            queryset = queryset.filter(user_type__iexact=user_type)
         
         status = self.request.GET.get('status')
         if status == 'active':
@@ -218,9 +219,10 @@ class InquiryManagementView(AdminRequiredMixin, ListView):
     def get_queryset(self):
         queryset = Inquiry.objects.select_related('rental_property', 'sender', 'rental_property__owner').order_by('-created_at')
         
+        # Case-insensitive filter
         status = self.request.GET.get('status')
         if status:
-            queryset = queryset.filter(status=status)
+            queryset = queryset.filter(status__iexact=status)
         
         search = self.request.GET.get('search')
         if search:
