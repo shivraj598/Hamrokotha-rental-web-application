@@ -12,6 +12,7 @@ from apps.accounts.models import User
 from apps.properties.models import Property, PropertyView, Favorite
 from apps.inquiries.models import Inquiry, InquiryMessage
 from apps.services.models import FindRoomRequest, ShiftHomeRequest
+from apps.core.choices import PropertyType
 
 
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -276,12 +277,12 @@ class AnalyticsView(AdminRequiredMixin, TemplateView):
         # Total rent value
         context['total_rent_value'] = Property.objects.filter(
             status='APPROVED'
-        ).aggregate(total=Sum('price'))['total'] or 0
+        ).aggregate(total=Sum('price_per_month'))['total'] or 0
         
         # Average price
         context['avg_price'] = Property.objects.filter(
             status='APPROVED'
-        ).aggregate(avg=Avg('price'))['avg'] or 0
+        ).aggregate(avg=Avg('price_per_month'))['avg'] or 0
         
         # Conversion rate (inquiries with viewing requests / total inquiries)
         total_inquiries = Inquiry.objects.count()
@@ -321,7 +322,8 @@ class AnalyticsView(AdminRequiredMixin, TemplateView):
         property_types = Property.objects.values('property_type').annotate(
             count=Count('id')
         ).order_by('-count')
-        type_labels = [Property.PROPERTY_TYPE_CHOICES[next((i for i, c in enumerate(Property.PROPERTY_TYPE_CHOICES) if c[0] == pt['property_type']), 0)][1] for pt in property_types]
+        property_type_dict = dict(PropertyType.choices)
+        type_labels = [property_type_dict.get(pt['property_type'], pt['property_type']) for pt in property_types]
         type_data = [pt['count'] for pt in property_types]
         context['property_type_labels'] = json.dumps(type_labels)
         context['property_type_data'] = json.dumps(type_data)
@@ -339,8 +341,8 @@ class AnalyticsView(AdminRequiredMixin, TemplateView):
         for pr in price_ranges:
             count = Property.objects.filter(
                 status='APPROVED',
-                price__gte=pr['min'],
-                price__lt=pr['max']
+                price_per_month__gte=pr['min'],
+                price_per_month__lt=pr['max']
             ).count()
             price_distribution.append({
                 'label': pr['label'],
@@ -368,7 +370,7 @@ class AnalyticsView(AdminRequiredMixin, TemplateView):
             district_stats.append({
                 'name': name,
                 'count': props.count(),
-                'avg_price': props.aggregate(avg=Avg('price'))['avg'] or 0,
+                'avg_price': props.aggregate(avg=Avg('price_per_month'))['avg'] or 0,
                 'inquiries': Inquiry.objects.filter(rental_property__district=code).count(),
             })
         context['district_stats'] = district_stats

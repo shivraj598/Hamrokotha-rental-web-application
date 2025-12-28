@@ -146,7 +146,7 @@
                                 <p class="text-xs text-gray-500">{{ property.get_property_type_display }}</p>
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ property.area }}, {{ property.get_district_display }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-900">Rs. {{ property.price|floatformat:0 }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">Rs. {{ property.price_per_month|floatformat:0 }}</td>
                             <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ property.views_count }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ property.inquiry_count }}</td>
                         </tr>
