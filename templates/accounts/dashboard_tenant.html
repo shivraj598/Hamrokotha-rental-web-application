@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load core_tags %}
+
+{% block title %}Tenant Dashboard - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Tenant Dashboard</h1>
+                <p class="text-gray-600">Welcome back, {{ user.first_name }}!</p>
+            </div>
+            <a href="{% url 'properties:list' %}" 
+               class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-secondary-600 text-white rounded-lg hover:bg-secondary-700 transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                Find Properties
+            </a>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+            <!-- Favorites -->
+            <div class="stat-card bg-white rounded-xl shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Saved Properties</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_favorites }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Inquiries Sent -->
+            <div class="stat-card bg-white rounded-xl shadow-md p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Inquiries Sent</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_inquiries }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="stat-card bg-gradient-to-r from-secondary-500 to-secondary-600 rounded-xl shadow-md p-6 text-white">
+                <p class="text-sm opacity-80 mb-2">Looking for a room?</p>
+                <a href="{% url 'services:find_room' %}" 
+                   class="inline-flex items-center text-white font-medium hover:underline">
+                    Let us help you find one
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Favorite Properties -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-gray-900">Saved Properties</h2>
+                        <a href="{% url 'properties:favorites' %}" class="text-primary-600 hover:text-primary-700 text-sm">
+                            View All
+                        </a>
+                    </div>
+                    
+                    {% if favorites %}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+                            {% for fav in favorites %}
+                                <a href="{% url 'properties:detail' fav.property.pk %}" 
+                                   class="block border rounded-lg overflow-hidden hover:shadow-md transition">
+                                    <div class="h-32 bg-gray-100">
+                                        {% if fav.property.primary_image %}
+                                            <img src="{{ fav.property.primary_image.image.url }}" 
+                                                 alt="{{ fav.property.title }}"
+                                                 class="w-full h-full object-cover">
+                                        {% else %}
+                                            <div class="w-full h-full flex items-center justify-center">
+                                                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="p-3">
+                                        <p class="font-medium text-gray-900 truncate">{{ fav.property.title }}</p>
+                                        <p class="text-sm text-gray-500">{{ fav.property.area }}, {{ fav.property.district }}</p>
+                                        <p class="text-primary-600 font-semibold mt-1">{{ fav.property.price_per_month|npr }}/mo</p>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="p-8 text-center">
+                            <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                            <p class="text-gray-500 mb-4">No saved properties yet</p>
+                            <a href="{% url 'properties:list' %}" 
+                               class="inline-flex items-center px-4 py-2 bg-secondary-600 text-white rounded-lg hover:bg-secondary-700 transition">
+                                Browse Properties
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- My Inquiries -->
+            <div>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-gray-900">My Inquiries</h2>
+                        <a href="{% url 'inquiries:list' %}" class="text-primary-600 hover:text-primary-700 text-sm">
+                            View All
+                        </a>
+                    </div>
+                    
+                    {% if inquiries %}
+                        <div class="divide-y divide-gray-100">
+                            {% for inquiry in inquiries %}
+                                <a href="{% url 'inquiries:detail' inquiry.pk %}" 
+                                   class="block p-4 hover:bg-gray-50 transition">
+                                    <p class="font-medium text-gray-900 truncate">{{ inquiry.property.title }}</p>
+                                    <p class="text-sm text-gray-500">{{ inquiry.property.area }}, {{ inquiry.property.district }}</p>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <span class="text-xs px-2 py-1 rounded-full
+                                              {% if inquiry.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                                              {% elif inquiry.status == 'REPLIED' %}bg-green-100 text-green-800
+                                              {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                            {{ inquiry.get_status_display }}
+                                        </span>
+                                        <span class="text-xs text-gray-400">{{ inquiry.created_at|timesince }} ago</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="p-8 text-center">
+                            <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                            </svg>
+                            <p class="text-gray-500">No inquiries sent yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Services -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden mt-6">
+                    <div class="px-6 py-4 border-b border-gray-100">
+                        <h2 class="text-lg font-semibold text-gray-900">Our Services</h2>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <a href="{% url 'services:find_room' %}" 
+                           class="block p-4 border border-secondary-200 rounded-lg hover:border-secondary-500 hover:bg-secondary-50 transition">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="font-medium text-gray-900">Find Room</p>
+                                    <p class="text-sm text-gray-500">Let us find your perfect room</p>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="{% url 'services:shift_home' %}" 
+                           class="block p-4 border border-primary-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="font-medium text-gray-900">Shift Home</p>
+                                    <p class="text-sm text-gray-500">Moving? We can help!</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recommended Properties -->
+        <div class="mt-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold text-gray-900">Recommended for You</h2>
+                <a href="{% url 'properties:list' %}" class="text-primary-600 hover:text-primary-700">
+                    View All →
+                </a>
+            </div>
+            
+            {% if recommended_properties %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for property in recommended_properties %}
+                        {% include 'includes/property_card.html' %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-500 text-center py-8">No properties available at the moment.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

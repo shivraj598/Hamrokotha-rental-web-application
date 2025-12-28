@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-6">
+            <a href="{% url 'accounts:profile' %}" class="inline-flex items-center text-gray-600 hover:text-gray-900">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Profile
+            </a>
+        </div>
+        
+        <!-- Edit Form -->
+        <div class="bg-white rounded-xl shadow-md p-8">
+            <h1 class="text-2xl font-bold text-gray-900 mb-6">Edit Profile</h1>
+            
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Profile Picture -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+                    <div class="flex items-center">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" 
+                                 alt="{{ user.get_full_name }}"
+                                 class="w-20 h-20 rounded-full object-cover mr-4">
+                        {% else %}
+                            <div class="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center mr-4">
+                                <span class="text-2xl font-bold text-primary-600">
+                                    {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+                                </span>
+                            </div>
+                        {% endif %}
+                        <div class="flex-grow">
+                            {{ form.profile_picture }}
+                            <p class="text-xs text-gray-500 mt-1">JPG, PNG or WebP. Max 5MB.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Name Fields -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="id_first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.first_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="id_last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.last_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Email -->
+                <div>
+                    <label for="id_email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Phone -->
+                <div>
+                    <label for="id_phone_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    {{ form.phone_number }}
+                    {% if form.phone_number.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.phone_number.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- District -->
+                <div>
+                    <label for="id_district" class="block text-sm font-medium text-gray-700 mb-1">District</label>
+                    {{ form.district }}
+                    {% if form.district.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.district.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Address -->
+                <div>
+                    <label for="id_address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.address.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Buttons -->
+                <div class="flex justify-end space-x-4 pt-4">
+                    <a href="{% url 'accounts:profile' %}" 
+                       class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Change Password Link -->
+        <div class="mt-6 text-center">
+            <a href="{% url 'accounts:password_reset' %}" class="text-primary-600 hover:text-primary-700">
+                Change Password →
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
