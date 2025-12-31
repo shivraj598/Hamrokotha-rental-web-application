@@ -121,7 +121,7 @@ class User(AbstractUser):
     def inquiries_count(self):
         """Get count of inquiries made or received."""
         if self.is_tenant:
-            return self.inquiries_sent.count()
+            return self.sent_inquiries.count()
         elif self.is_landlord:
             from apps.inquiries.models import Inquiry
             return Inquiry.objects.filter(rental_property__owner=self).count()
