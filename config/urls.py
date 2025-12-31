@@ -28,6 +28,9 @@ urlpatterns = [
     
     # Custom Admin Panel
     path('admin-dashboard/', include('apps.admin_panel.urls', namespace='admin_panel')),
+    
+    # Chat
+    path('chat/', include('apps.chat.urls', namespace='chat')),
 ]
 
 # Serve media files in development

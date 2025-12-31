@@ -19,12 +19,18 @@
                 <a href="{% url 'properties:list' %}" class="text-white hover:text-primary-400 font-medium transition">
                     Properties
                 </a>
-                <a href="{% url 'services:find_room' %}" class="text-white hover:text-primary-400 font-medium transition">
+                <!-- Find Room Feed - visible to all -->
+                <a href="{% url 'services:room_requests' %}" class="text-white hover:text-primary-400 font-medium transition">
                     Find Room
                 </a>
-                <a href="{% url 'services:shift_home' %}" class="text-white hover:text-primary-400 font-medium transition">
-                    Shift Home
-                </a>
+                {% if not user.is_authenticated or user.user_type == 'TENANT' %}
+                    <a href="{% url 'services:find_room' %}" class="text-white hover:text-primary-400 font-medium transition">
+                        Post Request
+                    </a>
+                    <a href="{% url 'services:shift_home' %}" class="text-white hover:text-primary-400 font-medium transition">
+                        Shift Home
+                    </a>
+                {% endif %}
                 
                 {% if user.is_authenticated %}
                     <!-- User Menu -->
@@ -100,6 +106,15 @@
                                 Inquiries
                             </a>
                             
+                            <a href="{% url 'chat:list' %}" 
+                               class="block px-4 py-2 text-gray-700 hover:bg-gray-100 relative">
+                                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
+                                </svg>
+                                Messages
+                                <span id="chat-badge-dropdown" class="hidden absolute top-1 right-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full"></span>
+                            </a>
+                            
                             {% if user.is_staff %}
                                 <hr class="my-2">
                                 <a href="{% url 'admin_panel:dashboard' %}" 
@@ -162,14 +177,21 @@
         <div class="px-4 py-3 space-y-3">
             <a href="{% url 'core:home' %}" class="block text-white hover:text-primary-400">Home</a>
             <a href="{% url 'properties:list' %}" class="block text-white hover:text-primary-400">Properties</a>
-            <a href="{% url 'services:find_room' %}" class="block text-white hover:text-primary-400">Find Room</a>
-            <a href="{% url 'services:shift_home' %}" class="block text-white hover:text-primary-400">Shift Home</a>
+            <a href="{% url 'services:room_requests' %}" class="block text-white hover:text-primary-400">Find Room</a>
+            {% if not user.is_authenticated or user.user_type == 'TENANT' %}
+                <a href="{% url 'services:find_room' %}" class="block text-white hover:text-primary-400">Post Request</a>
+                <a href="{% url 'services:shift_home' %}" class="block text-white hover:text-primary-400">Shift Home</a>
+            {% endif %}
             
             {% if user.is_authenticated %}
                 <hr class="my-2 border-gray-600">
                 <a href="{% url 'accounts:dashboard' %}" class="block text-white hover:text-primary-400">Dashboard</a>
                 <a href="{% url 'accounts:profile' %}" class="block text-white hover:text-primary-400">Profile</a>
                 <a href="{% url 'inquiries:list' %}" class="block text-white hover:text-primary-400">Inquiries</a>
+                <a href="{% url 'chat:list' %}" class="block text-white hover:text-primary-400">
+                    Messages
+                    <span id="chat-badge-mobile" class="hidden ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full"></span>
+                </a>
                 {% if user.is_staff %}
                     <a href="{% url 'admin_panel:dashboard' %}" class="block text-primary-300">Admin Panel</a>
                 {% endif %}

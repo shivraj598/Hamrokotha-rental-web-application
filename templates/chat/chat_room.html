@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat with {{ other_user.get_full_name }} - {{ SITE_NAME }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        height: calc(100vh - 200px);
+        min-height: 400px;
+    }
+    .messages-container {
+        height: calc(100% - 80px);
+        overflow-y: auto;
+    }
+    .message-bubble {
+        max-width: 75%;
+        word-wrap: break-word;
+    }
+    .message-own {
+        background-color: #3b82f6;
+        color: white;
+    }
+    .message-other {
+        background-color: #f3f4f6;
+        color: #1f2937;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-4">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden chat-container flex flex-col">
+        <!-- Chat Header -->
+        <div class="bg-gray-800 text-white px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'chat:list' %}" class="text-gray-300 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </a>
+                
+                {% if other_user.profile_picture %}
+                    <img src="{{ other_user.profile_picture.url }}" 
+                         class="w-10 h-10 rounded-full object-cover"
+                         alt="{{ other_user.get_full_name }}">
+                {% else %}
+                    <div class="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center">
+                        <span class="text-white font-semibold">
+                            {{ other_user.first_name|slice:":1"|upper }}
+                        </span>
+                    </div>
+                {% endif %}
+                
+                <div>
+                    <h2 class="font-semibold">{{ other_user.get_full_name }}</h2>
+                    <p class="text-sm text-gray-300">{{ other_user.get_user_type_display }}</p>
+                </div>
+            </div>
+            
+            {% if chat_room.property %}
+                <a href="{% url 'properties:detail' pk=chat_room.property.pk %}" 
+                   class="text-xs bg-gray-700 px-3 py-1 rounded-full hover:bg-gray-600 transition">
+                    <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    {{ chat_room.property.title|truncatechars:25 }}
+                </a>
+            {% endif %}
+        </div>
+        
+        <!-- Messages -->
+        <div id="messages-container" class="messages-container p-4 space-y-4 bg-gray-50">
+            {% if messages_list %}
+                {% for message in messages_list %}
+                    <div class="flex {% if message.sender == request.user %}justify-end{% else %}justify-start{% endif %}" data-message-id="{{ message.id }}">
+                        <div class="flex items-end space-x-2 {% if message.sender == request.user %}flex-row-reverse space-x-reverse{% endif %}">
+                            {% if message.sender != request.user %}
+                                {% if message.sender.profile_picture %}
+                                    <img src="{{ message.sender.profile_picture.url }}" 
+                                         class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                         alt="{{ message.sender.get_full_name }}">
+                                {% else %}
+                                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                                        <span class="text-gray-600 text-sm font-medium">
+                                            {{ message.sender.first_name|slice:":1"|upper }}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                            
+                            <div class="message-bubble rounded-2xl px-4 py-2 {% if message.sender == request.user %}message-own{% else %}message-other{% endif %}">
+                                <p class="text-sm whitespace-pre-wrap">{{ message.content }}</p>
+                                <p class="text-xs mt-1 {% if message.sender == request.user %}text-blue-100{% else %}text-gray-500{% endif %}">
+                                    {{ message.created_at|time:"g:i A" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div id="no-messages" class="text-center py-12">
+                    <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                    <p class="text-gray-500">No messages yet. Start the conversation!</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Message Input -->
+        <div class="border-t border-gray-200 p-4 bg-white">
+            <form id="message-form" class="flex items-center space-x-4">
+                {% csrf_token %}
+                <input type="text" 
+                       id="message-input" 
+                       name="content"
+                       class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                       placeholder="Type your message..."
+                       autocomplete="off"
+                       required>
+                <button type="submit" 
+                        id="send-button"
+                        class="bg-primary-600 text-white px-6 py-2 rounded-full hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition flex items-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                    <span class="ml-2 hidden sm:inline">Send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const chatRoomId = '{{ chat_room.id }}';
+    const currentUserId = {{ request.user.id }};
+    const csrfToken = '{{ csrf_token }}';
+    let lastMessageId = null;
+    let isPolling = true;
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        scrollToBottom();
+        initMessageForm();
+        startPolling();
+        
+        // Get last message ID
+        const messages = document.querySelectorAll('[data-message-id]');
+        if (messages.length > 0) {
+            lastMessageId = messages[messages.length - 1].getAttribute('data-message-id');
+        }
+    });
+    
+    function scrollToBottom() {
+        const container = document.getElementById('messages-container');
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function initMessageForm() {
+        const form = document.getElementById('message-form');
+        const input = document.getElementById('message-input');
+        const button = document.getElementById('send-button');
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const content = input.value.trim();
+            if (!content) return;
+            
+            // Disable form
+            input.disabled = true;
+            button.disabled = true;
+            
+            try {
+                const response = await fetch(`/chat/${chatRoomId}/send/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: `content=${encodeURIComponent(content)}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Add message to UI
+                    addMessageToUI(data.message);
+                    input.value = '';
+                    lastMessageId = data.message.id;
+                } else {
+                    alert(data.error || 'Failed to send message');
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Failed to send message. Please try again.');
+            } finally {
+                input.disabled = false;
+                button.disabled = false;
+                input.focus();
+            }
+        });
+    }
+    
+    function addMessageToUI(message) {
+        const container = document.getElementById('messages-container');
+        const noMessages = document.getElementById('no-messages');
+        
+        // Remove "no messages" placeholder
+        if (noMessages) {
+            noMessages.remove();
+        }
+        
+        const isOwn = message.is_own;
+        
+        const messageHtml = `
+            <div class="flex ${isOwn ? 'justify-end' : 'justify-start'}" data-message-id="${message.id}">
+                <div class="flex items-end space-x-2 ${isOwn ? 'flex-row-reverse space-x-reverse' : ''}">
+                    ${!isOwn ? `
+                        <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                            <span class="text-gray-600 text-sm font-medium">${message.sender_initial}</span>
+                        </div>
+                    ` : ''}
+                    <div class="message-bubble rounded-2xl px-4 py-2 ${isOwn ? 'message-own' : 'message-other'}">
+                        <p class="text-sm whitespace-pre-wrap">${escapeHtml(message.content)}</p>
+                        <p class="text-xs mt-1 ${isOwn ? 'text-blue-100' : 'text-gray-500'}">${message.created_at}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', messageHtml);
+        scrollToBottom();
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function startPolling() {
+        // Poll for new messages every 3 seconds
+        setInterval(async function() {
+            if (!isPolling) return;
+            
+            try {
+                let url = `/chat/${chatRoomId}/messages/`;
+                if (lastMessageId) {
+                    url += `?after=${lastMessageId}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success && data.messages.length > 0) {
+                    data.messages.forEach(message => {
+                        // Only add if not own message (own messages are added immediately)
+                        if (!message.is_own) {
+                            // Check if message already exists
+                            if (!document.querySelector(`[data-message-id="${message.id}"]`)) {
+                                addMessageToUI(message);
+                            }
+                        }
+                        lastMessageId = message.id;
+                    });
+                }
+            } catch (error) {
+                console.error('Polling error:', error);
+            }
+        }, 3000);
+    }
+    
+    // Pause polling when window is not visible
+    document.addEventListener('visibilitychange', function() {
+        isPolling = !document.hidden;
+    });
+</script>
+{% endblock %}

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'apps.inquiries.apps.InquiriesConfig',
     'apps.services.apps.ServicesConfig',
     'apps.admin_panel.apps.AdminPanelConfig',
+    'apps.chat.apps.ChatConfig',
 ]
 
 MIDDLEWARE = [
@@ -89,24 +90,27 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DATABASE_NAME', default='rental_platform_db'),
-        'USER': config('DATABASE_USER', default='postgres'),
-        'PASSWORD': config('DATABASE_PASSWORD', default=''),
-        'HOST': config('DATABASE_HOST', default='localhost'),
-        'PORT': config('DATABASE_PORT', default='5432'),
-    }
-}
+# Check if we should use SQLite or PostgreSQL
+USE_SQLITE = config('USE_SQLITE', default='false').lower() == 'true'
 
-# Use SQLite for development if USE_SQLITE is set or DATABASE_PASSWORD is empty
-_db_password = config('DATABASE_PASSWORD', default='')
-if DEBUG and (config('USE_SQLITE', default='false').lower() == 'true' or not _db_password):
+if USE_SQLITE:
+    # SQLite for simple development
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    # PostgreSQL for development and production
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DATABASE_NAME', default='rental_platform_db'),
+            'USER': config('DATABASE_USER', default='postgres'),
+            'PASSWORD': config('DATABASE_PASSWORD', default=''),
+            'HOST': config('DATABASE_HOST', default='localhost'),
+            'PORT': config('DATABASE_PORT', default='5432'),
         }
     }
 
