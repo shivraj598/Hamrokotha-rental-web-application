@@ -23,9 +23,9 @@ class PropertyAdmin(admin.ModelAdmin):
     list_display = [
         'title', 'owner_name', 'district', 'area', 
         'property_type', 'price_display', 'status_badge', 
-        'views_count', 'created_at'
+        'views_count', 'is_flagged', 'created_at'
     ]
-    list_filter = ['status', 'district', 'property_type', 'is_featured', 'created_at']
+    list_filter = ['status', 'district', 'property_type', 'is_featured', 'is_flagged', 'created_at']
     search_fields = ['title', 'description', 'area', 'address', 'owner__username', 'owner__email']
     readonly_fields = ['id', 'slug', 'views_count', 'inquiries_count', 'created_at', 'updated_at', 'approved_at']
     ordering = ['-created_at']
@@ -113,7 +113,7 @@ class PropertyAdmin(admin.ModelAdmin):
 class PropertyImageAdmin(admin.ModelAdmin):
     """Admin for PropertyImage model."""
     
-    list_display = ['property', 'caption', 'is_primary', 'order', 'uploaded_at']
+    list_display = ['property', 'caption', 'is_primary', 'order', 'image_hash', 'uploaded_at']
     list_filter = ['is_primary', 'uploaded_at']
     search_fields = ['property__title', 'caption']
     ordering = ['property', 'order']

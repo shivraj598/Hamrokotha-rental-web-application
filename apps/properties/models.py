@@ -6,8 +6,10 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
+from django.utils import timezone
 from apps.core.choices import District, PropertyType, PropertyStatus, AMENITIES
 import uuid
+import hashlib
 
 
 class Property(models.Model):
@@ -88,6 +90,12 @@ class Property(models.Model):
     )
     rejection_reason = models.TextField(blank=True, null=True)
     is_featured = models.BooleanField(default=False)
+
+    # Fraud / Moderation flags
+    is_flagged = models.BooleanField(default=False)
+    fraud_reason = models.TextField(blank=True, null=True)
+    flag_count = models.PositiveIntegerField(default=0)
+    flagged_at = models.DateTimeField(blank=True, null=True)
     
     # Statistics
     views_count = models.PositiveIntegerField(default=0)
@@ -160,6 +168,7 @@ class PropertyImage(models.Model):
         related_name='images'
     )
     image = models.ImageField(upload_to='properties/%Y/%m/')
+    image_hash = models.CharField(max_length=64, blank=True, null=True, db_index=True)
     caption = models.CharField(max_length=200, blank=True)
     is_primary = models.BooleanField(default=False)
     order = models.PositiveSmallIntegerField(default=0)
@@ -178,7 +187,49 @@ class PropertyImage(models.Model):
                 property=self.property, 
                 is_primary=True
             ).update(is_primary=False)
+
+        # Compute SHA256 hash of the image file if present
+        try:
+            if self.image and (not self.image_hash or hasattr(self.image.file, 'read')):
+                self.image.file.seek(0)
+                data = self.image.file.read()
+                sha = hashlib.sha256(data).hexdigest()
+                self.image_hash = sha
+        except Exception:
+            # If hashing fails, silently continue (don't block saves)
+            pass
+
         super().save(*args, **kwargs)
+
+        # Detection: find duplicate images by exact hash on other properties
+        if self.image_hash:
+            duplicates = PropertyImage.objects.filter(image_hash=self.image_hash).exclude(pk=self.pk)
+            for dup in duplicates.select_related('property__owner'):
+                # If duplicate belongs to a different owner, flag both properties
+                if dup.property.owner != self.property.owner:
+                    now = timezone.now()
+
+                    # Flag this property
+                    try:
+                        self.property.is_flagged = True
+                        self.property.flag_count = (self.property.flag_count or 0) + 1
+                        msg = f"Duplicate image detected with property {dup.property.id} (owner: {dup.property.owner.username})"
+                        self.property.fraud_reason = (self.property.fraud_reason or '') + '\n' + msg
+                        self.property.flagged_at = now
+                        self.property.save(update_fields=['is_flagged', 'flag_count', 'fraud_reason', 'flagged_at'])
+                    except Exception:
+                        pass
+
+                    # Flag the duplicate's property as well
+                    try:
+                        dup.property.is_flagged = True
+                        dup.property.flag_count = (dup.property.flag_count or 0) + 1
+                        msg2 = f"Duplicate image detected with property {self.property.id} (owner: {self.property.owner.username})"
+                        dup.property.fraud_reason = (dup.property.fraud_reason or '') + '\n' + msg2
+                        dup.property.flagged_at = now
+                        dup.property.save(update_fields=['is_flagged', 'flag_count', 'fraud_reason', 'flagged_at'])
+                    except Exception:
+                        pass
 
 
 class Favorite(models.Model):
