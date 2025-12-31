@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Room Requests - Find Your Next Tenant | HamroKotha{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <div class="max-w-2xl mx-auto py-6 px-4">
+        
+        <!-- Page Header -->
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Find Room</h1>
+                <p class="text-gray-600">Browse requests from tenants looking for rooms</p>
+            </div>
+            {% if user.is_authenticated and user.user_type == 'TENANT' %}
+                <a href="{% url 'services:find_room' %}" 
+                   class="inline-flex items-center px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition shadow-sm">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    New Post
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6" x-data="{ showFilters: false }">
+            <button @click="showFilters = !showFilters" 
+                    class="flex items-center justify-between w-full text-left">
+                <span class="font-medium text-gray-700">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    Filter Requests
+                </span>
+                <svg class="w-5 h-5 transition-transform" :class="{ 'rotate-180': showFilters }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            
+            <form x-show="showFilters" x-transition method="get" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <select name="district" class="form-select rounded-lg border-gray-300">
+                    <option value="">All Districts</option>
+                    {% for value, label in districts %}
+                        <option value="{{ value }}" {% if request.GET.district == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <select name="property_type" class="form-select rounded-lg border-gray-300">
+                    <option value="">All Types</option>
+                    {% for value, label in property_types %}
+                        <option value="{{ value }}" {% if request.GET.property_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition">
+                    Apply Filters
+                </button>
+            </form>
+        </div>
+
+        <!-- Posts Feed -->
+        <div class="space-y-4">
+            {% for post in requests %}
+                <article class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                    <!-- Post Header -->
+                    <div class="p-4 border-b border-gray-100">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center space-x-3">
+                                <!-- User Avatar -->
+                                {% if post.user.profile_picture %}
+                                    <img src="{{ post.user.profile_picture.url }}" 
+                                         class="w-12 h-12 rounded-full object-cover" 
+                                         alt="{{ post.user.get_full_name }}">
+                                {% else %}
+                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                                        <span class="text-white font-bold text-lg">{{ post.user.first_name|slice:":1"|upper }}</span>
+                                    </div>
+                                {% endif %}
+                                
+                                <div>
+                                    <h3 class="font-semibold text-gray-900">{{ post.user.get_full_name }}</h3>
+                                    <p class="text-sm text-gray-500">
+                                        <span class="inline-flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            {{ post.created_at|timesince }} ago
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Status Badge -->
+                            <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full
+                                  {% if post.status == 'ACTIVE' %}bg-green-100 text-green-800
+                                  {% elif post.status == 'MATCHED' %}bg-blue-100 text-blue-800
+                                  {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ post.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Post Content -->
+                    <div class="p-4">
+                        <h2 class="text-lg font-bold text-gray-900 mb-2">{{ post.title }}</h2>
+                        
+                        <!-- Requirements Tags -->
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <span class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                {{ post.get_district_display }}
+                            </span>
+                            <span class="inline-flex items-center px-3 py-1 bg-purple-50 text-purple-700 text-sm rounded-full">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                </svg>
+                                {{ post.get_property_type_display }}
+                            </span>
+                            <span class="inline-flex items-center px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                {{ post.get_budget_range_display }}
+                            </span>
+                            <span class="inline-flex items-center px-3 py-1 bg-orange-50 text-orange-700 text-sm rounded-full">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Move: {{ post.move_in_date|date:"M d, Y" }}
+                            </span>
+                        </div>
+                        
+                        <!-- Preferred Areas -->
+                        <p class="text-gray-700 mb-3">
+                            <span class="font-medium">Preferred Areas:</span> {{ post.preferred_areas }}
+                        </p>
+                        
+                        {% if post.additional_requirements %}
+                            <p class="text-gray-600 text-sm">{{ post.additional_requirements|truncatewords:30 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Post Stats & Actions -->
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                    {{ post.views_count }} views
+                                </span>
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                    </svg>
+                                    {{ post.replies_count }} comments
+                                </span>
+                            </div>
+                            
+                            <a href="{% url 'services:room_request_detail' post.pk %}" 
+                               class="inline-flex items-center px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition">
+                                View & Comment
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="bg-white rounded-xl shadow-sm p-12 text-center">
+                    <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">No room requests yet</h3>
+                    <p class="text-gray-500 mb-6 max-w-md mx-auto">
+                        {% if user.is_authenticated and user.user_type == 'TENANT' %}
+                            Be the first to post a room request! Let landlords know what you're looking for.
+                        {% elif user.is_authenticated and user.user_type == 'LANDLORD' %}
+                            There are no tenant requests at the moment. Check back later!
+                        {% else %}
+                            Tenants can post their room requirements here. Landlords can view and respond to requests.
+                        {% endif %}
+                    </p>
+                    {% if user.is_authenticated and user.user_type == 'TENANT' %}
+                        <a href="{% url 'services:find_room' %}" 
+                           class="inline-flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition shadow-sm">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Post Your First Request
+                        </a>
+                    {% elif not user.is_authenticated %}
+                        <div class="flex items-center justify-center space-x-4">
+                            <a href="{% url 'accounts:login' %}" 
+                               class="inline-flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition">
+                                Login
+                            </a>
+                            <a href="{% url 'accounts:register' %}" 
+                               class="inline-flex items-center px-6 py-3 border border-primary-600 text-primary-600 font-medium rounded-lg hover:bg-primary-50 transition">
+                                Register
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+            <div class="mt-8 flex justify-center">
+                <nav class="flex items-center space-x-2">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.district %}&district={{ request.GET.district }}{% endif %}{% if request.GET.property_type %}&property_type={{ request.GET.property_type }}{% endif %}" 
+                           class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                            Previous
+                        </a>
+                    {% endif %}
+                    
+                    <span class="px-4 py-2 text-gray-600">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.district %}&district={{ request.GET.district }}{% endif %}{% if request.GET.property_type %}&property_type={{ request.GET.property_type }}{% endif %}" 
+                           class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                            Next
+                        </a>
+                    {% endif %}
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

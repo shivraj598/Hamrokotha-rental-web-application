@@ -1,14 +1,14 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from django.urls import reverse
 
 
 class FindRoomRequest(models.Model):
-    """Request from a tenant looking for a room/property."""
+    """Request from a tenant looking for a room/property - visible to landlords."""
     
     STATUS_CHOICES = [
-        ('PENDING', 'Pending'),
-        ('REVIEWING', 'Under Review'),
+        ('ACTIVE', 'Active'),
         ('MATCHED', 'Matched'),
         ('CLOSED', 'Closed'),
     ]
@@ -42,6 +42,9 @@ class FindRoomRequest(models.Model):
         related_name='find_room_requests'
     )
     
+    # Title for the ad
+    title = models.CharField(max_length=200, help_text="Short title for your room request")
+    
     # Contact
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -60,19 +63,63 @@ class FindRoomRequest(models.Model):
     additional_requirements = models.TextField(blank=True, help_text="Any specific requirements")
     
     # Status
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
-    admin_notes = models.TextField(blank=True, help_text="Internal notes for admin")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ACTIVE')
+    
+    # View count
+    views_count = models.PositiveIntegerField(default=0)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'Find Room Request'
-        verbose_name_plural = 'Find Room Requests'
+        verbose_name = 'Room Request'
+        verbose_name_plural = 'Room Requests'
     
     def __str__(self):
-        return f"Room Request by {self.name} in {self.get_district_display()}"
+        return f"{self.title} - {self.get_district_display()}"
+    
+    def get_absolute_url(self):
+        return reverse('services:room_request_detail', kwargs={'pk': self.pk})
+    
+    @property
+    def replies_count(self):
+        return self.replies.count()
+
+
+class RoomRequestReply(models.Model):
+    """Reply/comment on a room request by landlords."""
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    room_request = models.ForeignKey(
+        FindRoomRequest,
+        on_delete=models.CASCADE,
+        related_name='replies'
+    )
+    landlord = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='room_request_replies'
+    )
+    message = models.TextField()
+    property_link = models.ForeignKey(
+        'properties.Property',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='room_request_replies',
+        help_text="Optionally link one of your properties"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Room Request Reply'
+        verbose_name_plural = 'Room Request Replies'
+    
+    def __str__(self):
+        return f"Reply by {self.landlord.get_full_name()} on {self.room_request.title}"
 
 
 class ShiftHomeRequest(models.Model):

@@ -1,74 +1,126 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}My Room Finding Requests - {{ SITE_NAME }}{% endblock %}
+{% block title %}Room Requests - {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
 <div class="bg-gray-50 min-h-screen py-8">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">My Room Finding Requests</h1>
-                <p class="text-gray-600">Track your room finding requests</p>
-            </div>
-            <a href="{% url 'services:find_room' %}" 
-               class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                New Request
-            </a>
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Room Requests</h1>
+            <p class="mt-2 text-gray-600">Browse requests from tenants looking for rooms. Reply to connect with them!</p>
         </div>
         
+        <!-- Filters -->
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">District</label>
+                    <select name="district" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                        <option value="">All Districts</option>
+                        {% for value, label in districts %}
+                            <option value="{{ value }}" {% if request.GET.district == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+                    <select name="property_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                        <option value="">All Types</option>
+                        {% for value, label in property_types %}
+                            <option value="{{ value }}" {% if request.GET.property_type == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Budget Range</label>
+                    <select name="budget" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                        <option value="">Any Budget</option>
+                        {% for value, label in budget_ranges %}
+                            <option value="{{ value }}" {% if request.GET.budget == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-primary-600 text-white py-2 px-4 rounded-lg hover:bg-primary-700 transition">
+                        Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Request Cards -->
         {% if requests %}
-            <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for req in requests %}
                     <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition">
-                        <div class="p-6">
-                            <div class="flex items-start justify-between">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-3 mb-2">
-                                        <h3 class="font-semibold text-gray-900">
-                                            {{ req.get_property_type_display }} in {{ req.get_district_display }}
-                                        </h3>
-                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full
-                                              {% if req.status == 'PENDING' %}bg-yellow-100 text-yellow-800
-                                              {% elif req.status == 'REVIEWING' %}bg-blue-100 text-blue-800
-                                              {% elif req.status == 'MATCHED' %}bg-green-100 text-green-800
-                                              {% else %}bg-gray-100 text-gray-800{% endif %}">
-                                            {{ req.get_status_display }}
-                                        </span>
+                        <div class="p-5">
+                            <!-- Status Badge -->
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Active
+                                </span>
+                                <span class="text-sm text-gray-500">{{ req.created_at|timesince }} ago</span>
+                            </div>
+                            
+                            <!-- Title -->
+                            <a href="{% url 'services:room_request_detail' req.pk %}" class="block">
+                                <h3 class="text-lg font-semibold text-gray-900 hover:text-primary-600 transition line-clamp-2 mb-2">
+                                    {{ req.title }}
+                                </h3>
+                            </a>
+                            
+                            <!-- User Info -->
+                            <div class="flex items-center mb-3">
+                                {% if req.user.profile_picture %}
+                                    <img src="{{ req.user.profile_picture.url }}" class="w-8 h-8 rounded-full object-cover" alt="{{ req.user.get_full_name }}">
+                                {% else %}
+                                    <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
+                                        <span class="text-primary-600 font-medium text-sm">{{ req.user.first_name|slice:":1"|upper }}</span>
                                     </div>
-                                    
-                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                        <div>
-                                            <p class="text-gray-500">Budget</p>
-                                            <p class="font-medium text-gray-900">{{ req.get_budget_range_display }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-gray-500">Bedrooms</p>
-                                            <p class="font-medium text-gray-900">{{ req.bedrooms }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-gray-500">Move-in Date</p>
-                                            <p class="font-medium text-gray-900">{{ req.move_in_date|date:"M d, Y" }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-gray-500">Submitted</p>
-                                            <p class="font-medium text-gray-900">{{ req.created_at|date:"M d, Y" }}</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <p class="text-sm text-gray-500 mt-3">
-                                        <strong>Preferred Areas:</strong> {{ req.preferred_areas }}
-                                    </p>
-                                </div>
-                                
-                                <a href="{% url 'services:find_room_detail' req.pk %}" 
-                                   class="ml-4 text-primary-600 hover:text-primary-700">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                {% endif %}
+                                <span class="ml-2 text-sm text-gray-600">{{ req.name }}</span>
+                            </div>
+                            
+                            <!-- Details -->
+                            <div class="space-y-2 text-sm text-gray-600">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                     </svg>
+                                    {{ req.get_district_display }} - {{ req.preferred_areas|truncatechars:30 }}
+                                </div>
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                    {{ req.get_property_type_display }} • {{ req.bedrooms }} Bedroom{% if req.bedrooms > 1 %}s{% endif %}
+                                </div>
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Budget: {{ req.get_budget_range_display }}
+                                </div>
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Move in: {{ req.move_in_date|date:"M d, Y" }}
+                                </div>
+                            </div>
+                            
+                            <!-- Footer -->
+                            <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                    </svg>
+                                    {{ req.replies_count }} replies
+                                </div>
+                                <a href="{% url 'services:room_request_detail' req.pk %}" class="text-primary-600 hover:text-primary-700 font-medium text-sm">
+                                    View & Reply →
                                 </a>
                             </div>
                         </div>
@@ -77,40 +129,26 @@
             </div>
             
             <!-- Pagination -->
-            {% if is_paginated %}
+            {% if page_obj.has_other_pages %}
                 <div class="mt-8 flex justify-center">
-                    <nav class="flex items-center gap-2">
+                    <nav class="flex items-center space-x-2">
                         {% if page_obj.has_previous %}
-                            <a href="?page={{ page_obj.previous_page_number }}" 
-                               class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                                Previous
-                            </a>
+                            <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50">Previous</a>
                         {% endif %}
-                        
-                        <span class="px-4 py-2 text-gray-600">
-                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                        </span>
-                        
+                        <span class="px-4 py-2 text-gray-600">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
                         {% if page_obj.has_next %}
-                            <a href="?page={{ page_obj.next_page_number }}" 
-                               class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                                Next
-                            </a>
+                            <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50">Next</a>
                         {% endif %}
                     </nav>
                 </div>
             {% endif %}
         {% else %}
-            <div class="bg-white rounded-xl shadow-md p-12 text-center">
+            <div class="text-center py-16 bg-white rounded-xl shadow-sm">
                 <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No Requests Yet</h3>
-                <p class="text-gray-500 mb-6">You haven't submitted any room finding requests yet.</p>
-                <a href="{% url 'services:find_room' %}" 
-                   class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
-                    Submit Your First Request
-                </a>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No room requests found</h3>
+                <p class="text-gray-500">Check back later or adjust your filters.</p>
             </div>
         {% endif %}
     </div>

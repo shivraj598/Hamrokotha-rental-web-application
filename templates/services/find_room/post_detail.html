@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ request_obj.title }} | HamroKotha{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <div class="max-w-2xl mx-auto py-6 px-4">
+        
+        <!-- Back Button -->
+        <a href="{% url 'services:room_requests' %}" 
+           class="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Feed
+        </a>
+
+        <!-- Main Post -->
+        <article class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+            <!-- Post Header -->
+            <div class="p-4 border-b border-gray-100">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center space-x-3">
+                        <!-- User Avatar -->
+                        {% if request_obj.user.profile_picture %}
+                            <img src="{{ request_obj.user.profile_picture.url }}" 
+                                 class="w-14 h-14 rounded-full object-cover" 
+                                 alt="{{ request_obj.user.get_full_name }}">
+                        {% else %}
+                            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                                <span class="text-white font-bold text-xl">{{ request_obj.user.first_name|slice:":1"|upper }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        <div>
+                            <h3 class="font-semibold text-gray-900 text-lg">{{ request_obj.user.get_full_name }}</h3>
+                            <p class="text-sm text-gray-500">
+                                {{ request_obj.created_at|timesince }} ago
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <!-- Status Badge -->
+                        <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full
+                              {% if request_obj.status == 'ACTIVE' %}bg-green-100 text-green-800
+                              {% elif request_obj.status == 'MATCHED' %}bg-blue-100 text-blue-800
+                              {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ request_obj.get_status_display }}
+                        </span>
+                        
+                        {% if is_owner %}
+                            {% if request_obj.status == 'ACTIVE' %}
+                                <form action="{% url 'services:close_room_request' request_obj.pk %}" method="post" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            onclick="return confirm('Are you sure you want to close this request?')"
+                                            class="text-gray-600 hover:text-gray-800 text-sm px-2 py-1 border border-gray-300 rounded hover:bg-gray-50">
+                                        Close
+                                    </button>
+                                </form>
+                            {% endif %}
+                            <form action="{% url 'services:delete_room_request' request_obj.pk %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        onclick="return confirm('Are you sure you want to delete this request? This action cannot be undone.')"
+                                        class="text-red-600 hover:text-red-800 text-sm px-2 py-1 border border-red-300 rounded hover:bg-red-50">
+                                    Delete
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Post Content -->
+            <div class="p-4">
+                <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ request_obj.title }}</h1>
+                
+                <!-- Requirements Tags -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        {{ request_obj.get_district_display }}
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        {{ request_obj.get_property_type_display }}
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1.5 bg-amber-50 text-amber-700 rounded-full">
+                        {{ request_obj.bedrooms }} Bedroom{{ request_obj.bedrooms|pluralize }}
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1.5 bg-green-50 text-green-700 rounded-full">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {{ request_obj.get_budget_range_display }}
+                    </span>
+                </div>
+                
+                <!-- Move-in & Duration -->
+                <div class="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="text-sm text-gray-500">Move-in Date</p>
+                        <p class="font-medium text-gray-900">{{ request_obj.move_in_date|date:"F d, Y" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Duration</p>
+                        <p class="font-medium text-gray-900">{{ request_obj.duration_months }} months</p>
+                    </div>
+                </div>
+                
+                <!-- Preferred Areas -->
+                <div class="mb-4">
+                    <h4 class="font-medium text-gray-700 mb-2">Preferred Areas</h4>
+                    <p class="text-gray-900">{{ request_obj.preferred_areas }}</p>
+                </div>
+                
+                {% if request_obj.additional_requirements %}
+                    <div class="mb-4">
+                        <h4 class="font-medium text-gray-700 mb-2">Additional Requirements</h4>
+                        <p class="text-gray-600">{{ request_obj.additional_requirements }}</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Post Stats -->
+            <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                    <span class="flex items-center">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        {{ request_obj.views_count }} views
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        {{ request_obj.replies.count }} comments
+                    </span>
+                </div>
+                
+                {% if user.is_authenticated and user != request_obj.user %}
+                    <a href="{% url 'chat:start' request_obj.user.pk %}" 
+                       class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        Message {{ request_obj.user.first_name }}
+                    </a>
+                {% endif %}
+            </div>
+        </article>
+
+        <!-- Comments Section -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">
+                    Comments <span class="text-gray-400 font-normal">({{ request_obj.replies.count }})</span>
+                </h2>
+            </div>
+            
+            <!-- Comment Form for Landlords -->
+            {% if can_reply and request_obj.status == 'ACTIVE' %}
+                <div class="p-4 border-b border-gray-200 bg-gray-50">
+                    <form action="{% url 'services:room_request_reply' request_obj.pk %}" method="post">
+                        {% csrf_token %}
+                        
+                        <div class="flex items-start space-x-3">
+                            {% if user.profile_picture %}
+                                <img src="{{ user.profile_picture.url }}" 
+                                     class="w-10 h-10 rounded-full object-cover" 
+                                     alt="{{ user.get_full_name }}">
+                            {% else %}
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-secondary-400 to-secondary-600 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white font-bold">{{ user.first_name|slice:":1"|upper }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="flex-1">
+                                <textarea name="message" rows="3" 
+                                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                                          placeholder="Write a comment... Introduce your property or ask questions"></textarea>
+                                
+                                <div class="mt-3 flex items-center justify-between">
+                                    <div class="flex-1 mr-4">
+                                        <select name="property_link" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                            <option value="">Link a property (optional)</option>
+                                            {% for property in reply_form.property_link.field.queryset %}
+                                                <option value="{{ property.pk }}">{{ property.title }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    
+                                    <button type="submit" 
+                                            class="inline-flex items-center px-5 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                        </svg>
+                                        Post Comment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            {% elif user.is_authenticated and user.user_type == 'TENANT' and not is_owner %}
+                <div class="p-4 border-b border-gray-200 bg-yellow-50 text-center">
+                    <p class="text-yellow-700">Only landlords can comment on room requests.</p>
+                </div>
+            {% elif not user.is_authenticated %}
+                <div class="p-4 border-b border-gray-200 bg-blue-50 text-center">
+                    <p class="text-blue-700">
+                        <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="font-medium underline">Login</a> 
+                        as a landlord to comment on this request.
+                    </p>
+                </div>
+            {% elif request_obj.status != 'ACTIVE' %}
+                <div class="p-4 border-b border-gray-200 bg-gray-100 text-center">
+                    <p class="text-gray-600">This request is no longer active. Comments are disabled.</p>
+                </div>
+            {% endif %}
+            
+            <!-- Comments List -->
+            <div class="divide-y divide-gray-100">
+                {% for reply in request_obj.replies.all %}
+                    <div class="p-4 hover:bg-gray-50 transition">
+                        <div class="flex items-start space-x-3">
+                            <!-- Landlord Avatar -->
+                            {% if reply.landlord.profile_picture %}
+                                <img src="{{ reply.landlord.profile_picture.url }}" 
+                                     class="w-10 h-10 rounded-full object-cover" 
+                                     alt="{{ reply.landlord.get_full_name }}">
+                            {% else %}
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-secondary-400 to-secondary-600 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white font-bold">{{ reply.landlord.first_name|slice:":1"|upper }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between mb-1">
+                                    <div>
+                                        <span class="font-semibold text-gray-900">{{ reply.landlord.get_full_name }}</span>
+                                        <span class="inline-flex items-center ml-2 px-2 py-0.5 bg-secondary-100 text-secondary-700 text-xs rounded-full">
+                                            Landlord
+                                        </span>
+                                    </div>
+                                    <span class="text-sm text-gray-500">{{ reply.created_at|timesince }} ago</span>
+                                </div>
+                                
+                                <p class="text-gray-700 mb-2">{{ reply.message }}</p>
+                                
+                                {% if reply.property_link %}
+                                    <a href="{% url 'properties:detail' reply.property_link.pk %}" 
+                                       class="inline-flex items-center p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition group">
+                                        {% if reply.property_link.images.first %}
+                                            <img src="{{ reply.property_link.images.first.image.url }}" 
+                                                 class="w-16 h-16 rounded-lg object-cover mr-3"
+                                                 alt="{{ reply.property_link.title }}">
+                                        {% else %}
+                                            <div class="w-16 h-16 rounded-lg bg-gray-300 flex items-center justify-center mr-3">
+                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <p class="font-medium text-gray-900 group-hover:text-primary-600">{{ reply.property_link.title }}</p>
+                                            <p class="text-sm text-gray-500">Rs. {{ reply.property_link.price|floatformat:0 }}/month • {{ reply.property_link.address|truncatechars:25 }}</p>
+                                        </div>
+                                        <svg class="w-5 h-5 text-gray-400 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+                                {% endif %}
+                                
+                                <!-- Reply Actions -->
+                                <div class="flex items-center space-x-4 mt-3">
+                                    {% if is_owner %}
+                                        <a href="{% url 'chat:start' reply.landlord.pk %}" 
+                                           class="inline-flex items-center text-sm text-primary-600 hover:text-primary-800">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                            </svg>
+                                            Message
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if reply.property_link %}
+                                        <a href="{% url 'properties:detail' reply.property_link.pk %}" 
+                                           class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                            </svg>
+                                            View Property
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="p-12 text-center">
+                        <svg class="w-12 h-12 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <p class="text-gray-500">No comments yet. Be the first to respond!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

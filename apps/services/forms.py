@@ -1,19 +1,23 @@
 from django import forms
-from .models import FindRoomRequest, ShiftHomeRequest
+from .models import FindRoomRequest, ShiftHomeRequest, RoomRequestReply
 
 
 class FindRoomRequestForm(forms.ModelForm):
-    """Form for Find Room service requests."""
+    """Form for Find Room service requests - tenant posting a room ad."""
     
     class Meta:
         model = FindRoomRequest
         fields = [
-            'name', 'email', 'phone',
+            'title', 'name', 'email', 'phone',
             'property_type', 'district', 'preferred_areas',
             'budget_range', 'bedrooms', 'move_in_date',
             'duration_months', 'additional_requirements'
         ]
         widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
+                'placeholder': 'e.g., Looking for 2BHK in Baneshwor Area'
+            }),
             'name': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
                 'placeholder': 'Your full name'
@@ -66,7 +70,37 @@ class FindRoomRequestForm(forms.ModelForm):
         if user and user.is_authenticated:
             self.fields['name'].initial = user.get_full_name()
             self.fields['email'].initial = user.email
-            self.fields['phone'].initial = getattr(user, 'phone', '')
+            self.fields['phone'].initial = getattr(user, 'phone_number', '')
+
+
+class RoomRequestReplyForm(forms.ModelForm):
+    """Form for landlords to reply to room requests."""
+    
+    class Meta:
+        model = RoomRequestReply
+        fields = ['message', 'property_link']
+        widgets = {
+            'message': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
+                'rows': 4,
+                'placeholder': 'Write your reply... You can describe your property or ask questions.'
+            }),
+            'property_link': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
+            }),
+        }
+    
+    def __init__(self, *args, landlord=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['property_link'].required = False
+        self.fields['property_link'].empty_label = "-- Select a property (optional) --"
+        if landlord:
+            from apps.properties.models import Property
+            from apps.core.choices import PropertyStatus
+            self.fields['property_link'].queryset = Property.objects.filter(
+                owner=landlord,
+                status=PropertyStatus.APPROVED
+            )
 
 
 class ShiftHomeRequestForm(forms.ModelForm):
@@ -165,4 +199,4 @@ class ShiftHomeRequestForm(forms.ModelForm):
         if user and user.is_authenticated:
             self.fields['name'].initial = user.get_full_name()
             self.fields['email'].initial = user.email
-            self.fields['phone'].initial = getattr(user, 'phone', '')
+            self.fields['phone'].initial = getattr(user, 'phone_number', '')
