@@ -1,362 +1,238 @@
-# 🏠 HamroKotha - Rental Property Platform
+# Hamrokotha — Rental Web Application 🏡
 
-> Find your perfect rental property in Kathmandu Valley
+**Hamrokotha** is a Django-based rental web application that helps landlords list properties and tenants find and inquire about rentals. It includes account management (tenant, landlord, admin), property listings, inquiries, chat, admin panel, and service listings.
 
-A comprehensive rental property platform connecting landlords and tenants across Kathmandu, Bhaktapur, and Lalitpur districts in Nepal.
+---
 
-## 🌟 Features
+## Project Details — What this project is about
 
-### For Tenants
-- 🔍 **Advanced Search** - Filter properties by district, price, type with case-insensitive matching
-- ❤️ **Save Favorites** - Bookmark properties for later reference
-- 📝 **Send Inquiries** - Direct messaging to landlords
-- 🏠 **Find Room Service** - Request assistance finding rental properties
-- 🚚 **Shift Home Service** - Moving and relocation services
-- 📊 **Property Details** - View full property information with multiple images
+Hamrokotha is a web application that connects landlords, tenants, and service providers in the Kathmandu Valley. Its mission is to simplify property listings, tenant-landlord communication, and moving services while remaining lightweight and easy to deploy.
 
-### For Landlords
-- ➕ **Create Properties** - List properties with multiple images (up to 10)
-- 📊 **Dashboard** - View all your properties and statistics
-- 💬 **Manage Inquiries** - Receive and respond to tenant inquiries
-- ✏️ **Edit Properties** - Update property details anytime
-- 🗑️ **Delete Properties** - Remove listings from three convenient locations
-- ✅ **Status Tracking** - Track properties from pending approval to rented
+Primary goals:
+- Enable landlords to list properties quickly (with images and detailed metadata).
+- Allow tenants to search, filter, favorite, and send inquiries for properties.
+- Provide an admin dashboard for approvals, analytics, and user management.
+- Offer service listings (e.g., find-room, moving/shift-home services) and basic messaging between users.
 
-### Admin Panel
-- 👥 **User Management** - Verify, approve, and manage users
-- 🏢 **Property Approval** - Review and approve/reject property listings
-- 💬 **Inquiry Management** - Monitor all inquiries and communications
-- 📈 **Analytics** - View platform statistics and activity
-- 🔍 **Case-Insensitive Filters** - Search across all management views
-- 📋 **Activity Logging** - Track all platform activities
+Target users:
+- Tenants searching for rental properties
+- Landlords managing multiple properties
+- Site administrators and operators
 
-## 🛠️ Tech Stack
+---
 
-- **Backend:** Django 5.2.9 (Python 3.14.1)
-- **Frontend:** HTML5, Tailwind CSS 3, Alpine.js 3
-- **Database:** SQLite (development), PostgreSQL (production ready)
-- **Additional Libraries:**
-  - Django Crispy Forms
-  - Pillow (Image processing)
-  - Python-dotenv
+## Technology Stack (expanded)
 
-## 📁 Project Structure
+- Backend: Django (5.x), Python (3.10+ recommended)
+- Frontend: HTML5 templates, Tailwind CSS, Alpine.js for lightweight interactivity
+- Database: SQLite for development; PostgreSQL recommended for production
+- Images & File Uploads: Pillow (local storage in development; S3 or other object store recommended for production)
+- Forms & UI Helpers: django-crispy-forms (+ Tailwind integration)
+- Optional extras: Redis + Django Channels for realtime chat, Celery for background tasks
+- Static asset management: Django staticfiles, collectstatic for production
 
-```
-hamrokotha-rental-web-application/
-├── manage.py
-├── requirements.txt
-├── .env.example
-├── config/                          # Django settings
-│   ├── settings.py
-│   ├── urls.py
-│   ├── wsgi.py
-│   └── asgi.py
-├── apps/
-│   ├── accounts/                   # User authentication & profiles
-│   │   ├── models.py              # Custom User model with roles
-│   │   ├── views.py
-│   │   ├── forms.py
-│   │   └── urls.py
-│   ├── properties/                 # Property listings management
-│   │   ├── models.py              # Property, PropertyImage models
-│   │   ├── views.py               # CRUD operations
-│   │   ├── forms.py               # PropertyForm, PropertyImageForm
-│   │   └── urls.py
-│   ├── inquiries/                  # Booking inquiries & messages
-│   │   ├── models.py              # Inquiry model
-│   │   ├── views.py
-│   │   └── urls.py
-│   ├── services/                   # Find Room & Shift Home
-│   │   ├── models.py
-│   │   ├── views.py
-│   │   └── urls.py
-│   ├── admin_panel/                # Custom admin dashboard
-│   │   ├── views.py               # Admin-only views
-│   │   └── urls.py
-│   └── core/                       # Shared utilities
-├── static/                          # CSS, JS, images
-│   ├── css/
-│   ├── js/
-│   └── images/
-├── media/                           # Uploaded property images
-├── templates/                       # HTML templates
-│   ├── base.html
-│   ├── home.html
-│   ├── properties/
-│   ├── accounts/
-│   ├── includes/
-│   └── admin_panel/
-└── venv/                            # Virtual environment
-```
+---
 
-## 🚀 Getting Started
+## Architecture & Design
 
-### Prerequisites
+- Monolithic Django project split into small, focused apps in `apps/` (accounts, properties, inquiries, services, admin_panel, chat, core).
+- Server-side rendered templates with reusable partials in `templates/includes/`.
+- Media uploads live under `media/` and are referenced from models like `PropertyImage` and `Profile`.
+- Role-based access control (RBAC): custom user model supports `TENANT`, `LANDLORD`, and `ADMIN` roles.
+- Admin panel: custom views provide property approval workflow and analytics over site activity.
 
-- Python 3.10 or higher
-- pip (Python package manager)
-- Git
-- (Optional) PostgreSQL for production
+---
 
-### Installation
+## Key Models & Data
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/hamrokotha-rental-web-application.git
-   cd hamrokotha-rental-web-application
-   ```
+- User (custom): roles, profile data, avatar, contact info
+- Property: title, description, address, district, price, features, status (PENDING/APPROVED/REJECTED/RENTED)
+- PropertyImage: linked images for properties
+- Inquiry: messages from tenants to landlords referencing a property
+- ServiceRequest: (Find room / Shift home) user-submitted service inquiries
 
-2. **Create and activate virtual environment**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   # On Windows: venv\Scripts\activate
-   ```
+---
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Configuration & Important Environment Variables
 
-4. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+Add the following to your `.env` (or set via your deployment environment):
 
-5. **Run database migrations**
-   ```bash
-   python manage.py migrate
-   ```
+- SECRET_KEY — Django secret
+- DEBUG — `True` for dev, `False` for prod
+- ALLOWED_HOSTS — comma-separated hostnames
+- DATABASE_URL — e.g. `sqlite:///db.sqlite3` or a PostgreSQL URL
+- EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD — for outgoing emails
+- AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME — when using S3 for media/static
+- REDIS_URL — when using Channels/Celery
 
-6. **Create superuser account**
-   ```bash
-   python manage.py createsuperuser
-   ```
+---
 
-7. **Collect static files (production only)**
-   ```bash
-   python manage.py collectstatic
-   ```
+## Roadmap (short)
 
-8. **Run development server**
-   ```bash
-   python manage.py runserver
-   ```
+- Add email notifications for inquiries and account events
+- Integrate S3 (or another cloud store) for media files
+- Add optional realtime chat via Django Channels
+- Add tests for `accounts`, `properties`, and `inquiries` to increase coverage
 
-9. **Access the application**
-   - Frontend: http://127.0.0.1:8000/
-   - Django Admin: http://127.0.0.1:8000/admin/
-   - Custom Admin Panel: http://127.0.0.1:8000/admin-dashboard/
+---
 
-## 👤 Test Credentials (Development)
+## ✨ Features
 
-Default admin account:
-- **Username:** admin
-- **Password:** admin123
+- Multi-role Accounts: tenant, landlord, admin
+- Property management (create, edit, delete, list, favorites)
+- Inquiries and contact forms
+- Built-in chat for messaging
+- Admin panel with analytics and user management
+- Services listing (find room, shift home, etc.)
+- Responsive templates and static assets
 
-Test user accounts:
-- **Landlord:** shivraj (password: landlord123)
-- **Tenant:** sagar (password: tenant123)
+---
 
-> ⚠️ **IMPORTANT:** Change all default credentials immediately in production!
+## 📦 Requirements
 
-## 📌 API & URL Endpoints
+- Python 3.10+
+- pip
+- Virtual environment (`venv`, `virtualenv`) recommended
+- See `requirements.txt` for Python package dependencies
 
-### Public Routes
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Homepage with hero section |
-| `/properties/` | GET | Property listings with search |
-| `/properties/<id>/` | GET | Property detail view |
-| `/register/` | GET, POST | User registration |
-| `/login/` | GET, POST | User login |
-| `/logout/` | POST | User logout |
+---
 
-### Authenticated User Routes
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/dashboard/` | GET | User dashboard |
-| `/profile/` | GET, POST | User profile management |
-| `/favorites/` | GET | Saved favorite properties |
-| `/inquiries/` | GET | User inquiries |
+## ⚙️ Environment & Configuration
 
-### Landlord Routes
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/properties/create/` | GET, POST | Create new property |
-| `/properties/<id>/edit/` | GET, POST | Edit property |
-| `/properties/<id>/delete/` | POST | Delete property |
-| `/properties/my-properties/` | GET | Landlord's properties |
+1. Create a `.env` file (example variables):
 
-### Admin Routes
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/admin-dashboard/` | GET | Admin dashboard |
-| `/admin-dashboard/users/` | GET | User management |
-| `/admin-dashboard/properties/` | GET | Property approvals |
-| `/admin-dashboard/inquiries/` | GET | Inquiry management |
-
-## � Supported Districts
-
-### Kathmandu
-- Central areas: Thamel, Basantapur, Durbar Square
-- Eastern: Bhotebahal, Chabahil, Kamal Pokhari
-- Western: Naxal, Lazimpat, Dilli Bazaar
-- And 15+ more areas
-
-### Bhaktapur
-- Durbar Square, Taumadhi, Tachapal
-- Suryabinayak, Banepa, Madhyapur
-- And 9+ more areas
-
-### Lalitpur
-- Patan, Imadol, Lubhu
-- Godavari, Harisiddhi, Sunakothi
-- And 15+ more areas
-
-## 💰 Currency
-
-All prices are in **NPR (Nepali Rupees)**
-
-## � Security Features
-
-- ✅ CSRF Protection (Django built-in)
-- ✅ SQL Injection Prevention (Django ORM)
-- ✅ XSS Protection (Template auto-escaping)
-- ✅ Role-Based Access Control (RBAC)
-  - TENANT: Browse and inquire
-  - LANDLORD: Create, edit, delete properties
-  - ADMIN: Approve/reject, manage users
-- ✅ Secure Password Hashing (PBKDF2)
-- ✅ Image File Validation (Size & format checks)
-- ✅ User Email Verification (optional)
-- ✅ Session Management
-
-## 📦 Dependencies
-
-Key packages included in `requirements.txt`:
-- Django==5.2.9
-- Pillow (Image handling)
-- python-dotenv (Environment configuration)
-- django-crispy-forms (Form styling)
-- crispy-tailwind (Tailwind form templates)
-
-See `requirements.txt` for complete list.
-
-## 🎨 UI/UX Features
-
-- **Responsive Design** - Works on mobile, tablet, and desktop
-- **Dark Navigation** - Modern dark navbar matching footer
-- **Transparent Search Box** - Hero section with transparency effects
-- **Nepal Mountain Background** - Beautiful Kathmandu Valley imagery
-- **Case-Insensitive Filters** - User-friendly search across all views
-- **Alpine.js Interactions** - Smooth dropdown menus and interactions
-- **Tailwind CSS** - Modern, accessible styling
-
-## 🔄 Property Lifecycle
-
-```
-User Creates Property
-        ↓
-    [PENDING] (Awaiting Admin Review)
-        ↓
-    ├─→ [APPROVED] → Visible to Tenants
-    │       ↓
-    │   [RENTED] (Property Rented Out)
-    │
-    └─→ [REJECTED] (Admin Rejected)
+```env
+SECRET_KEY=replace_with_secure_value
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+DATABASE_URL=sqlite:///db.sqlite3  # or configure postgres
+EMAIL_BACKEND=smtp
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=you@example.com
+EMAIL_HOST_PASSWORD=supersecret
 ```
 
-## 📝 Database Models
+2. Update `config/settings.py` to load environment variables (project already has a `config/` module).
 
-### User Model
-- Custom user model with roles: LANDLORD, TENANT, ADMIN
-- Profile picture, email verification, phone number
+---
 
-### Property Model
-- Title, description, address, district
-- Price, property type, bedrooms, bathrooms
-- Status (PENDING, APPROVED, REJECTED, RENTED)
-- Multiple images (PropertyImage model)
-- Timestamps (created_at, updated_at)
+## 🛠 Development: Get Started Locally
 
-### Inquiry Model
-- Sender (Tenant) → Recipient (Landlord)
-- Property reference
-- Message content
-- Status tracking
+1. Clone the repo
 
-## 🧪 Testing
+```bash
+git clone <repo-url>
+cd Hamrokotha-rental-web-application
+```
 
-Run tests with:
+2. Create and activate a virtualenv
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+3. Configure environment variables
+
+```bash
+cp .env.example .env
+# edit .env with your values
+```
+
+4. Apply migrations and create a superuser
+
+```bash
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+5. Collect static files (for production or to view static assets served)
+
+```bash
+python manage.py collectstatic
+```
+
+6. Run the development server
+
+```bash
+python manage.py runserver
+# Visit http://127.0.0.1:8000
+```
+
+---
+
+## 🔁 Tests
+
+Run Django tests:
+
 ```bash
 python manage.py test
 ```
 
-## 📚 Documentation
-
-- API endpoints documented in code comments
-- Model relationships clearly defined
-- Form validation rules specified
-- View permission mixins for access control
-
-## 🐛 Known Issues
-
-- None currently reported
-
-## 🚀 Future Enhancements
-
-- [ ] Email notifications for inquiries
-- [ ] Property reviews and ratings
-- [ ] Advanced reporting features
-- [ ] Google Maps integration
-- [ ] Multiple language support (Nepali/English)
-- [ ] Mobile app (React Native)
-- [ ] Payment integration
-- [ ] Property scheduling/viewing
-
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see LICENSE file for details.
-
-## 👨‍💻 Author
-
-**Shivraj Timilsena**
-- GitHub: [@shivrajtimilsena](https://github.com/shivrajtimilsena)
-- Email: timilsenashivraj598@gmail.com
-
-## 📧 Support & Contact
-
-For questions, issues, or suggestions:
-- Open an issue on GitHub
-- Email: timilsenashivraj598@gmail.com
-- Visit: www.hamrokotha.com
-
-## 🙏 Acknowledgments
-
-- Django community for the amazing framework
-- Tailwind CSS for utility-first styling
-- Unsplash for beautiful imagery
-- All contributors and testers
+(There are tests in `apps/properties/tests/` and other apps — add/extend tests as you add features.)
 
 ---
 
-<div align="center">
+## 📁 Project Structure (high-level)
 
-Made with ❤️ for Kathmandu Valley | Find Your Perfect Home Today! 🏡
+- `manage.py` — Django management entrypoint
+- `config/` — Django settings, URLs, ASGI/WGSI
+- `apps/` — Django apps (accounts, properties, inquiries, chat, services, admin_panel, core)
+- `templates/` — HTML templates (base, pages, apps)
+- `static/` — CSS, JS, images
+- `media/` — Uploaded media (profiles, property images)
 
-⭐ If you like this project, please consider giving it a star!
+---
 
-</div>
+## 🔧 Deployment Notes
+
+- Use PostgreSQL in production and set `DEBUG=False`.
+- Configure proper `ALLOWED_HOSTS` and secure `SECRET_KEY` via environment variables.
+- Serve static files with a CDN or `whitenoise` / proper webserver configuration.
+- Media files should be stored on S3 or equivalent in production.
+- Run migrations during deployment: `python manage.py migrate`.
+
+Optional: containerize with Docker and use a process manager (Gunicorn + Nginx) for production.
+
+---
+
+## ✅ Common Management Commands
+
+- `python manage.py createsuperuser` — create an admin
+- `python manage.py collectstatic` — collect static assets
+- `python manage.py loaddata <fixture>` — load fixtures
+- `python manage.py shell` — interactive shell
+
+---
+
+## 💡 Contributing
+
+Thanks for considering contributing! A suggested workflow:
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Add tests and ensure existing tests pass
+4. Run `flake8` / linters if configured
+5. Open a pull request with a clear description
+
+Please follow the existing code patterns in `apps/` and keep changes scoped to one purpose per PR.
+
+---
+
+## 📣 Notes & TODOs
+
+- Add a `LICENSE` file (MIT, Apache2, or other) if you want this project open source.
+- Add `Dockerfile` and `docker-compose.yml` for local reproducible environments (if needed).
+- Add CI (GitHub Actions) to run tests and lint on PRs.
+
+---
+
+## 📞 Contact
+
+For questions or help, open an issue or reach out to the maintainers in this repository.
+
+---
+
+*Generated by GitHub Copilot using project files — customize any section above as needed.*
