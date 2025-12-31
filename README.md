@@ -221,13 +221,6 @@ Please follow the existing code patterns in `apps/` and keep changes scoped to o
 
 ---
 
-## 📣 Notes & TODOs
-
-- Add a `LICENSE` file (MIT, Apache2, or other) if you want this project open source.
-- Add `Dockerfile` and `docker-compose.yml` for local reproducible environments (if needed).
-- Add CI (GitHub Actions) to run tests and lint on PRs.
-
----
 
 ## 📞 Contact
 
